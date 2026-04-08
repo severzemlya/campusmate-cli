@@ -121,24 +121,27 @@ export function parseSearchResults(html: string): SearchResponse {
     const code = normalise($(tds[1]).text());
     const name = normalise($(tds[2]).text());
 
-    // Extract lecture code from the href as a fallback / cross-check
+    // Extract lecture code and detail URL from the href
     const href = $(tds[2]).find("a").attr("href") ?? "";
     const hrefCode = href.match(/kougicd=(\d+)/)?.[1] ?? "";
 
-    const schedule = normalise($(tds[3]).text());
+    const rawSchedule = normalise($(tds[3]).text());
     const instructor = normalise($(tds[4]).text());
 
     // Separate semester from schedule: the cell contains text like
-    // "春学期　水曜日　４時限" (all joined with full-width spaces which
-    // we've already normalised to ASCII spaces above).
-    // The semester is typically "春学期" or "前期" etc. (everything before
-    // the first 曜日 fragment). We keep it simple and expose the full text.
+    // "春学期　水曜日　４時限" (joined with full-width spaces U+3000).
+    // Split on the first 曜日 boundary to get semester vs day/period.
+    const dayMatch = rawSchedule.match(/^(.+?)\s*([月火水木金土日]曜日.*)$/);
+    const semester = dayMatch ? dayMatch[1] : rawSchedule;
+    const schedule = dayMatch ? dayMatch[2] : rawSchedule;
+
     results.push({
       code: code || hrefCode,
       name,
-      semester: schedule, // raw combined text; callers may split further
+      semester,
       schedule,
       instructor,
+      ...(href ? { detailUrl: href } : {}),
     });
   });
 

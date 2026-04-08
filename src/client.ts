@@ -144,9 +144,25 @@ export class CampusmateClient {
           "Accept-Encoding": "identity",
         },
       });
-      const lectureResults = parseSearchResults(lectureRes.data);
-      total += lectureResults.total;
-      allResults.push(...lectureResults.results);
+      const firstPage = parseSearchResults(lectureRes.data);
+      total += firstPage.total;
+      allResults.push(...firstPage.results);
+
+      // Paginate within this instructor's lecture list
+      let page = 2;
+      while (allResults.length < limit && allResults.length < total) {
+        const pageBody = this.buildFormBody({
+          "navigateKougiList": "",
+          "value(pageCount)": String(page),
+          "value(maxCount)": "10",
+          "timestamp": "",
+        });
+        const pageHtml = await this.postSearch("slbsskyr.do", pageBody);
+        const pageResult = parseSearchResults(pageHtml);
+        if (pageResult.results.length === 0) break;
+        allResults.push(...pageResult.results);
+        page++;
+      }
     }
 
     const trimmed = allResults.slice(0, limit);
@@ -189,9 +205,24 @@ export class CampusmateClient {
     return { total: firstPage.total, count: trimmed.length, results: trimmed };
   }
 
-  async getDetail(code: string, year?: number): Promise<SyllabusDetail> {
+  async getDetail(code: string, year?: number, detailUrl?: string): Promise<SyllabusDetail> {
+    let url: string;
+    if (detailUrl) {
+      // Use the exact URL from search results (preserves correct crclumcd etc.)
+      // detailUrl is an absolute path like /campusweb/slbssbdr.do?...
+      const fullUrl = detailUrl.startsWith("http")
+        ? detailUrl
+        : `https://ku-portal.kyushu-u.ac.jp${detailUrl}`;
+      const res = await axios.get(fullUrl, {
+        headers: { "Accept-Encoding": "identity" },
+      });
+      const detail = parseDetailPage(res.data);
+      if (!detail.code) detail.code = code;
+      return detail;
+    }
+    // Fallback: construct URL with empty crclumcd (works for most courses)
     const y = year ?? this.currentYear();
-    const url = `slbssbdr.do?value(risyunen)=${y}&value(semekikn)=1&value(kougicd)=${code}&value(crclumcd)=ZZ`;
+    url = `slbssbdr.do?value(risyunen)=${y}&value(semekikn)=1&value(kougicd)=${code}&value(crclumcd)=`;
     const res = await this.http.get(url, {
       headers: { "Accept-Encoding": "identity" },
     });

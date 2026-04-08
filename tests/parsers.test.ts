@@ -3,7 +3,7 @@ import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 import { describe, it, expect } from "vitest";
 
-import { parseSearchResults, parseDetailPage } from "../src/parsers.js";
+import { parseSearchResults, parseInstructorResults, parseDetailPage } from "../src/parsers.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const fixture = (name: string) =>
@@ -68,6 +68,38 @@ describe("parseSearchResults – 線形代数 results page", () => {
       expect(r.name).toBeTruthy();
     }
   });
+
+  // semester / schedule separation
+  it("first result semester is 春学期", () => {
+    expect(result.results[0].semester).toBe("春学期");
+  });
+
+  it("first result schedule does not contain 春学期", () => {
+    expect(result.results[0].schedule).not.toContain("春学期");
+  });
+
+  it("semester and schedule are different for first result", () => {
+    expect(result.results[0].semester).not.toBe(result.results[0].schedule);
+  });
+
+  // detailUrl extraction
+  it("first result has detailUrl containing slbssbdr.do", () => {
+    expect(result.results[0].detailUrl).toContain("slbssbdr.do");
+  });
+
+  it("first result detailUrl contains crclumcd)=ZZ", () => {
+    expect(result.results[0].detailUrl).toContain("crclumcd)=ZZ");
+  });
+
+  it("second result detailUrl has empty crclumcd", () => {
+    expect(result.results[1].detailUrl).toMatch(/crclumcd\)=$/);
+  });
+
+  it("all results have detailUrl", () => {
+    for (const r of result.results) {
+      expect(r.detailUrl).toBeTruthy();
+    }
+  });
 });
 
 describe("parseSearchResults – no results page", () => {
@@ -84,6 +116,39 @@ describe("parseSearchResults – no results page", () => {
 
   it("returns empty results array", () => {
     expect(result.results).toHaveLength(0);
+  });
+});
+
+// ──────────────────────────────────────────────────────────────────────
+// parseInstructorResults
+// ──────────────────────────────────────────────────────────────────────
+
+describe("parseInstructorResults", () => {
+  it("returns empty array for HTML with no instructor buttons", () => {
+    const html = "<html><body>no buttons here</body></html>";
+    expect(parseInstructorResults(html)).toEqual([]);
+  });
+
+  it("extracts URLs from onclick attributes", () => {
+    const html = `
+      <html><body>
+        <input id="searchKougiURL" onclick="location.href='/campusweb/slbsskyr.do?value(nendo)=2026'" />
+        <input id="searchKougiURL" onclick="location.href='/campusweb/slbsskyr.do?value(nendo)=2025'" />
+      </body></html>
+    `;
+    const urls = parseInstructorResults(html);
+    expect(urls).toHaveLength(2);
+    expect(urls[0]).toBe("/campusweb/slbsskyr.do?value(nendo)=2026");
+    expect(urls[1]).toBe("/campusweb/slbsskyr.do?value(nendo)=2025");
+  });
+
+  it("ignores inputs without matching onclick", () => {
+    const html = `
+      <html><body>
+        <input id="searchKougiURL" onclick="doSomethingElse()" />
+      </body></html>
+    `;
+    expect(parseInstructorResults(html)).toEqual([]);
   });
 });
 
@@ -193,7 +258,7 @@ describe("parseDetailPage – lecture 26533320", () => {
   });
 
   // Weekly syllabus
-  it("extracts at least 10 weekly syllabus entries", () => {
+  it("extracts at least 1 weekly syllabus entry", () => {
     expect(detail.syllabus.length).toBeGreaterThanOrEqual(1);
   });
 

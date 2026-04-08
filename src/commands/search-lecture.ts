@@ -1,5 +1,6 @@
 import type { Command } from "commander";
 import { CampusmateClient } from "../client.js";
+import { parsePositiveInt } from "../validate.js";
 
 export function registerSearchLecture(program: Command): void {
   program
@@ -9,8 +10,8 @@ export function registerSearchLecture(program: Command): void {
     .option("--instructor <instructor>", "担当教員")
     .option("--faculty <code>", "開講学部・学府コード")
     .option("--semester <semester>", "開講時期")
-    .option("--year <year>", "年度", parseInt)
-    .option("--limit <limit>", "取得件数", parseInt, 10)
+    .option("--year <year>", "年度", parsePositiveInt)
+    .option("--limit <limit>", "取得件数", parsePositiveInt, 10)
     .action(async (opts) => {
       const client = new CampusmateClient();
       const result = await client.searchLecture({

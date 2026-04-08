@@ -4,6 +4,8 @@ export interface SearchResultItem {
   semester: string;
   schedule: string;
   instructor: string;
+  /** Raw detail page URL path extracted from the search result link */
+  detailUrl?: string;
 }
 
 export interface SearchResponse {
