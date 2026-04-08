@@ -8,7 +8,7 @@ import { registerDetail } from "./commands/detail.js";
 const program = new Command();
 
 program
-  .name("campusmate")
+  .name("campusmate-cli")
   .description("九州大学 Campusmate-J シラバス検索CLI")
   .version("1.0.0");
 

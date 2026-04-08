@@ -1,4 +1,4 @@
-# campusmate-skill
+# @severzemlya/campusmate-cli
 
 九州大学 Campusmate-J シラバス検索 CLI ツール。構造化された JSON を出力し、[Claude Code](https://docs.anthropic.com/en/docs/claude-code) のスキルとして利用できます。
 
@@ -14,43 +14,23 @@
 - Node.js 20+
 - `ku-portal.kyushu-u.ac.jp` へのネットワークアクセス
 
-## インストール
-
-```bash
-git clone https://github.com/<owner>/campusmate-skill.git
-cd campusmate-skill
-npm install
-npm run build
-```
-
 ## 使い方
 
-全コマンドは JSON を標準出力に出力します。
-
-### 講義名検索
+インストール不要 — `npx` でそのまま実行できます：
 
 ```bash
-node dist/index.js search-lecture --name "線形代数"
-node dist/index.js search-lecture --name "物理" --faculty "050" --limit 20
+npx @severzemlya/campusmate-cli search-lecture --name "線形代数"
+npx @severzemlya/campusmate-cli search-lecture --name "物理" --faculty "050" --limit 20
+npx @severzemlya/campusmate-cli search-instructor --name "田中"
+npx @severzemlya/campusmate-cli search-fulltext --keyword "機械学習"
+npx @severzemlya/campusmate-cli detail --code 26533320
 ```
 
-### 教員検索
+グローバルインストールも可能：
 
 ```bash
-node dist/index.js search-instructor --name "田中"
-```
-
-### 全文検索
-
-```bash
-node dist/index.js search-fulltext --keyword "機械学習"
-node dist/index.js search-fulltext --keyword "deep learning" --match any
-```
-
-### シラバス詳細取得
-
-```bash
-node dist/index.js detail --code 26533320
+npm install -g @severzemlya/campusmate-cli
+campusmate-cli search-lecture --name "線形代数"
 ```
 
 ### 共通オプション
@@ -102,39 +82,13 @@ node dist/index.js detail --code 26533320
 
 ## Claude Code スキル設定
 
-このツールは [Claude Code スキル](https://docs.anthropic.com/en/docs/claude-code/skills)として登録できます。スキル定義は [`SKILL.md`](SKILL.md) にあります。
+[Claude Code スキル](https://docs.anthropic.com/en/docs/claude-code/skills)定義が [`skills/campusmate-skill/SKILL.md`](skills/campusmate-skill/SKILL.md) にあります。
 
-### 方法 A: プロジェクト単位の設定
-
-スキルを使いたいプロジェクトの `.claude/settings.json` に追加：
-
-```json
-{
-  "skills": [
-    "/path/to/campusmate-skill"
-  ]
-}
-```
-
-### 方法 B: ユーザー単位の設定（全プロジェクトで利用可能）
-
-`~/.claude/settings.json` に追加：
-
-```json
-{
-  "skills": [
-    "/path/to/campusmate-skill"
-  ]
-}
-```
-
-### 方法 C: CLI で追加
+スキルディレクトリを Claude Code のスキルフォルダにコピーしてください：
 
 ```bash
-claude skill add /path/to/campusmate-skill
+cp -r skills/campusmate-skill ~/.claude/skills/
 ```
-
-### 動作確認
 
 登録後、九州大学の講義やシラバス、教員について質問すると自動的にスキルが呼び出されます。例：
 
@@ -147,6 +101,7 @@ claude skill add /path/to/campusmate-skill
 ## 開発
 
 ```bash
+npm install
 npm run build       # TypeScript コンパイル
 npm test            # テスト実行（51テスト）
 npm run test:watch  # ウォッチモード

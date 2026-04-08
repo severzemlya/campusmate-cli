@@ -1,11 +1,11 @@
 {
-  "name": "campusmate-skill",
+  "name": "@severzemlya/campusmate-cli",
   "version": "1.0.0",
-  "description": "",
+  "description": "CLI tool for searching Kyushu University Campusmate-J syllabus system",
   "main": "dist/index.js",
   "type": "module",
   "bin": {
-    "campusmate": "./dist/index.js"
+    "campusmate-cli": "./dist/index.js"
   },
   "scripts": {
     "build": "tsc",

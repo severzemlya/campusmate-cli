@@ -5,24 +5,16 @@ description: "Use when the user asks about Kyushu University (九州大学) cour
 
 # Campusmate-J Syllabus Search Tool
 
-Search the Kyushu University Campusmate-J syllabus system via CLI. The tool scrapes the live Campusmate-J portal and returns structured JSON — no API key or authentication required.
-
-## Setup
-
-Build before first use. This only needs to happen once (or after pulling updates):
-
-```bash
-cd <project-root> && npm install && npm run build
-```
+Search the Kyushu University Campusmate-J syllabus system via CLI. The tool scrapes the live Campusmate-J portal and returns structured JSON — no API key, authentication, or local setup required.
 
 ## Commands
 
-All commands output JSON to stdout. Parse the JSON and present results in a readable format — tables work well for search results, structured sections for detail.
+Run via `npx @severzemlya/campusmate-cli`. All commands output JSON to stdout. Parse the JSON and present results in a readable format — tables work well for search results, structured sections for detail.
 
 ### Search by Lecture Name
 
 ```bash
-node <project-root>/dist/index.js search-lecture --name "<講義名>" [--instructor "<教員名>"] [--faculty "<学部コード>"] [--semester "<開講時期>"] [--year <年度>] [--limit <件数>]
+npx @severzemlya/campusmate-cli search-lecture --name "<講義名>" [--instructor "<教員名>"] [--faculty "<学部コード>"] [--semester "<開講時期>"] [--year <年度>] [--limit <件数>]
 ```
 
 ### Search by Instructor
@@ -30,7 +22,7 @@ node <project-root>/dist/index.js search-lecture --name "<講義名>" [--instruc
 Find all lectures taught by an instructor. This performs a two-step lookup (find instructor → fetch their lectures), so it takes a bit longer than other searches.
 
 ```bash
-node <project-root>/dist/index.js search-instructor --name "<教員名>" [--department "<所属コード>"] [--year <年度>] [--limit <件数>]
+npx @severzemlya/campusmate-cli search-instructor --name "<教員名>" [--department "<所属コード>"] [--year <年度>] [--limit <件数>]
 ```
 
 ### Full-text Search
@@ -38,7 +30,7 @@ node <project-root>/dist/index.js search-instructor --name "<教員名>" [--depa
 Search across all syllabus content — useful when the user doesn't know the exact lecture name but knows a topic keyword.
 
 ```bash
-node <project-root>/dist/index.js search-fulltext --keyword "<キーワード>" [--match all|any] [--year <年度>] [--limit <件数>]
+npx @severzemlya/campusmate-cli search-fulltext --keyword "<キーワード>" [--match all|any] [--year <年度>] [--limit <件数>]
 ```
 
 ### Get Syllabus Detail
@@ -46,7 +38,7 @@ node <project-root>/dist/index.js search-fulltext --keyword "<キーワード>" 
 Retrieve the full syllabus for a specific lecture code. Use this after a search to get complete information.
 
 ```bash
-node <project-root>/dist/index.js detail --code <講義コード> [--year <年度>]
+npx @severzemlya/campusmate-cli detail --code <講義コード> [--year <年度>]
 ```
 
 ## Typical Workflow
