@@ -102,7 +102,7 @@ node dist/index.js detail --code 26533320
 
 ## Claude Code スキル設定
 
-このツールは [Claude Code スキル](https://docs.anthropic.com/en/docs/claude-code/skills)として登録できます。スキル定義は [`skill.md`](skill.md) にあります。
+このツールは [Claude Code スキル](https://docs.anthropic.com/en/docs/claude-code/skills)として登録できます。スキル定義は [`SKILL.md`](SKILL.md) にあります。
 
 ### 方法 A: プロジェクト単位の設定
 

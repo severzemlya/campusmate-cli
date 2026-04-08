@@ -102,7 +102,7 @@ See [`src/types.ts`](src/types.ts) for full type definitions.
 
 ## Claude Code Skill Setup
 
-This tool is designed to be registered as a [Claude Code skill](https://docs.anthropic.com/en/docs/claude-code/skills). The skill definition is in [`skill.md`](skill.md).
+This tool is designed to be registered as a [Claude Code skill](https://docs.anthropic.com/en/docs/claude-code/skills). The skill definition is in [`SKILL.md`](SKILL.md).
 
 ### Option A: Project-level configuration
 
