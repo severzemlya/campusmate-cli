@@ -3,4 +3,14 @@ dist/
 cookies.txt
 *.txt
 !tests/fixtures/*.html
+
+# Local config
 .claude/
+.mcp.json
+
+# Internal planning docs
+docs/superpowers/
+
+# Temp files
+snapshot-*.txt
+tmp-*.txt
