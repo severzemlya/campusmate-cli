@@ -6,7 +6,7 @@ import type {
   SearchResponse,
   SyllabusDetail,
 } from "./types.js";
-import { parseSearchResults, parseDetailPage } from "./parsers.js";
+import { parseSearchResults, parseInstructorResults, parseDetailPage } from "./parsers.js";
 
 const BASE_URL = "https://ku-portal.kyushu-u.ac.jp/campusweb/";
 
@@ -113,8 +113,9 @@ export class CampusmateClient {
     const year = String(opts.year ?? this.currentYear());
     const limit = opts.limit ?? 10;
 
+    // Step 1: Search for instructors
     const body = this.buildFormBody({
-      "buttonName": "searchKyoin",
+      "buttonName": "searchKyosy",
       "timestamp": timestamp,
       "value(nendo)": year,
       "value(syonamk)": opts.name,
@@ -122,26 +123,34 @@ export class CampusmateClient {
     });
 
     const html = await this.postSearch("slbsskyr.do", body);
-    const firstPage = parseSearchResults(html);
-    let allResults = [...firstPage.results];
 
-    let page = 2;
-    while (allResults.length < limit && allResults.length < firstPage.total) {
-      const pageBody = this.buildFormBody({
-        "navigateKougiList": "",
-        "value(pageCount)": String(page),
-        "value(maxCount)": "10",
-        "timestamp": "",
+    // Step 2: Parse instructor list to get URLs for their lectures
+    const instructorUrls = parseInstructorResults(html);
+    if (instructorUrls.length === 0) {
+      return { total: 0, count: 0, results: [] };
+    }
+
+    // Step 3: Follow each instructor's URL to get their lectures
+    // Use full URL to avoid axios encoding parentheses in query params
+    let allResults: SearchResponse["results"] = [];
+    let total = 0;
+
+    for (const path of instructorUrls) {
+      if (allResults.length >= limit) break;
+      const fullUrl = `https://ku-portal.kyushu-u.ac.jp${path}`;
+      const lectureRes = await axios.get(fullUrl, {
+        headers: {
+          Cookie: this.getCookieHeader(),
+          "Accept-Encoding": "identity",
+        },
       });
-      const pageHtml = await this.postSearch("slbsskyr.do", pageBody);
-      const pageResult = parseSearchResults(pageHtml);
-      if (pageResult.results.length === 0) break;
-      allResults.push(...pageResult.results);
-      page++;
+      const lectureResults = parseSearchResults(lectureRes.data);
+      total += lectureResults.total;
+      allResults.push(...lectureResults.results);
     }
 
     const trimmed = allResults.slice(0, limit);
-    return { total: firstPage.total, count: trimmed.length, results: trimmed };
+    return { total, count: trimmed.length, results: trimmed };
   }
 
   async searchFulltext(opts: FulltextSearchOptions): Promise<SearchResponse> {
@@ -150,7 +159,7 @@ export class CampusmateClient {
     const limit = opts.limit ?? 10;
 
     const body = this.buildFormBody({
-      "buttonName": "searchWord",
+      "buttonName": "searchKougi",
       "timestamp": timestamp,
       "value(nendo)": year,
       "value(keywords)": opts.keyword,

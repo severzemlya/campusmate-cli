@@ -18,6 +18,7 @@ import type {
 function normalise(text: string): string {
   return text
     .replace(/\u00a0/g, " ")   // &nbsp; → regular space
+    .replace(/\.none_display\s*\{[^}]*\}\s*/g, "") // strip CSS artifacts
     .replace(/[ \t\r\n]+/g, " ") // collapse ASCII whitespace runs
     .trim();
 }
@@ -142,6 +143,23 @@ export function parseSearchResults(html: string): SearchResponse {
   });
 
   return { total, count, results };
+}
+
+/**
+ * Parse instructor search results page.
+ * Returns an array of URLs to follow for each instructor's lecture list.
+ */
+export function parseInstructorResults(html: string): string[] {
+  const $ = load(html);
+  const urls: string[] = [];
+
+  $("input#searchKougiURL, input[id='searchKougiURL']").each((_, el) => {
+    const onclick = $(el).attr("onclick") ?? "";
+    const match = onclick.match(/location\.href='([^']+)'/);
+    if (match) urls.push(match[1]);
+  });
+
+  return urls;
 }
 
 /**
