@@ -1,0 +1,858 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja" lang="ja">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="Content-Language" content="ja" />
+    <meta http-equiv="Content-Script-Type" content="text/javascript" />
+    <meta http-equiv="Content-Style-Type" content="text/css" />
+    <meta name="format-detection" content="telephone=no"/>
+    <title>
+    
+    
+      Campusmate
+    
+    </title>
+
+
+    <script>
+      var waitingMessage = "お待ちください...";
+      var showBlockAlartMessage = "処理中です。しばらくお待ちください。";
+      var sessionExpirationAlertMessage = "まもなくセッションタイムアウトします。下のボタンからセッションタイムアウトを回避できます。";
+      var sessionContinuationButton = "セッションを継続する";
+      var sessionExpirationNotifyMessage = "セッションタイムアウトした恐れがあります。画面上の設定、若しくは入力内容があればお手元に控えた上で、再度ログインしてください。";
+      var closeAlertDialog = "閉じる";
+      var ajaxRequestError = "エラーが発生しました";
+      var addListenerError = "お使いのブラウザは対応していません。";
+      var noFoundResourceError = "存在しないファイルが指定されています。指定し直して下さい。";
+    </script>
+
+    <link rel="stylesheet" href="./css/superTables.css" type="text/css" media="screen" charset="utf-8" />
+    <link rel="stylesheet" href="./css/timepicker.css" type="text/css" charset="utf-8"/>
+    <link rel="stylesheet" href="./css/visualize.css" type="text/css" charset="utf-8" /> 
+    <link rel="stylesheet" href="./css/visualize-light.css" type="text/css" charset="utf-8" /> 
+    <link rel="stylesheet" href="./css/jquery.ui.slider.css" type="text/css" charset="utf-8" /> 
+    <link rel="stylesheet" href="./css/design01/common.css" type="text/css" media="screen" charset="utf-8" />
+    <link rel="stylesheet" href="./css/design01/theme.css" type="text/css" media="screen" charset="utf-8" />
+    <!--<link rel="stylesheet" href="./css/design01/common_en.css" type="text/css" media="screen" charset="utf-8" />-->
+    <!--<link rel="stylesheet" href="./css/design01/theme_en.css" type="text/css" media="screen" charset="utf-8" />-->
+    <link rel="stylesheet" href="./css/design01/common_print.css" type="text/css" media="print" charset="utf-8" />
+    <link rel="stylesheet" href="./css/design01/theme_print.css" type="text/css" media="print" charset="utf-8" />
+    <!--<link rel="stylesheet" href="./css/design01/theme_print_en.css" type="text/css" media="print" charset="utf-8" />-->
+    <link rel="stylesheet" href="./css/design01/jquery-ui-custom.css" type="text/css" charset="utf-8" /> 
+
+    <script language="JavaScript" type="text/JavaScript" src="./js/prototype.js"></script>
+    <script language="JavaScript" type="text/JavaScript" src="./js/effects.js"></script>
+    <script language="JavaScript" type="text/JavaScript" src="./js/dragdrop.js"></script>
+    <script language="JavaScript" type="text/JavaScript" src="./js/main.js"></script>
+    <script language="JavaScript" type="text/javascript" src="./js/superTables.js"></script>
+<!--[if IE]>
+    
+    <script language="JavaScript" type="text/JavaScript" src="./js/excanvas.js"></script>
+<![endif]-->
+
+    <script language="JavaScript" type="text/JavaScript" src="./js/jquery.js"></script>
+    <script type="text/javascript">jQuery.noConflict();var jq$ = jQuery;</script>
+    <script language="JavaScript" type="text/JavaScript" src="./js/jquery.ui.core.js"></script>
+    <script language="JavaScript" type="text/JavaScript" src="./js/jquery.ui.widget.js"></script>
+    <script language="JavaScript" type="text/JavaScript" src="./js/jquery.ui.button.js"></script>
+    <script language="JavaScript" type="text/JavaScript" src="./js/jquery.ui.mouse.js"></script>
+    <script language="JavaScript" type="text/JavaScript" src="./js/jquery.ui.slider.js"></script>
+    <script language="JavaScript" type="text/JavaScript" src="./js/jquery.ui.draggable.js"></script>
+    <script language="JavaScript" type="text/JavaScript" src="./js/jquery.ui.position.js"></script>
+    <script language="JavaScript" type="text/JavaScript" src="./js/jquery.ui.dialog.js"></script>
+    <script language="JavaScript" type="text/JavaScript" src="./js/jquery.tablefix.js"></script>
+    <script language="JavaScript" type="text/JavaScript" src="./js/date.js"></script>
+    <script language="JavaScript" type="text/JavaScript" src="./js/design01/common.js"></script>
+    <script language="JavaScript" type="text/JavaScript" src="./js/design01/theme.js"></script>
+    <script language="JavaScript" type="text/JavaScript" src="./js/jquery.ui.datepicker.js"></script>
+    <script language="JavaScript" type="text/JavaScript" src="./js/jquery.ui.datepicker-ja.js"></script>
+    <script language="JavaScript" type="text/JavaScript" src="./js/jquery.timePicker.js"></script>
+    <script language="JavaScript" type="text/JavaScript" src="./js/jquery.blockUI.js"></script>
+    <script language="JavaScript" type="text/JavaScript" src="./js/jquery.mousewheel.js"></script>
+    <script language="JavaScript" type="text/JavaScript" src="./js/main_jq.js"></script>
+    <script language="JavaScript" type="text/JavaScript" src="./js/jquery.upload.js"></script>
+    <script language="JavaScript" type="text/JavaScript" src="./js/visualize.jQuery.js"></script>
+    <script language="javascript" type="text/javascript">
+    <!--
+      restoreScreenState('', '', '');
+      
+      
+      if (false) {
+          monitoringSessionExpiration = startSessionExpirationMonitoring(3600, 600, 10);
+          monitoringSessionExpiration.initializeTimer();
+          window.addEventListener('resize', function(eve){
+              var resizeTimer = false;
+              if (resizeTimer !== false) {
+                  clearTimeout(resizeTimer);
+              }
+              resizeTimer = setTimeout(function() {
+                  monitoringSessionExpiration.resetPositioning();
+              }, 50);
+          }, false);
+      }
+    //-->
+    </script>
+
+  </head>
+
+<body>
+<div id="container">
+<div id="header">
+  
+  
+  <div id="head_top"></div>
+  <div id="head_left"></div>
+  <div id="head_right">
+    <div class="button">
+      
+      <input name="f_large" type="button" id="f_large" />
+      <input name="f_middle" type="button" id="f_middle" />
+      <input name="f_small" type="button" id="f_small" />
+      
+        <span id="help_space"> </span>
+        <span id="logout_space"> </span>
+        
+      
+      
+    </div>
+  </div>
+  <div class="clear"></div>
+  <div id="head_base"></div>
+  
+  <div id="top_menu">
+    <ul id="nav">
+
+      
+      
+        <li class="menu_end">
+        </li>
+      
+
+    </ul>
+    <br class="clear" />
+  </div>
+</div>
+
+<div id="content">
+  <table cellpadding="0" cellspacing="0" summary="layout">
+    <tr>
+      
+      
+
+
+
+
+
+
+
+
+
+
+<div id="login_inf_print">
+  <div class="top"></div>
+  <div class="mid">
+    
+    <ul class="user">
+    </ul>
+  
+  </div>
+  <div class="under"></div>
+</div>
+
+
+      
+      
+
+
+
+
+
+
+
+<td id="main">
+  
+    
+    <div id="title">
+      <h2>
+        講義から検索
+      </h2>
+    </div>
+    
+  
+
+
+
+
+
+
+<link href="./css/syllabus/syllabus.css" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+
+<form name="sylbsActionForm" id="form" method="post" action="/campusweb/slbsskgr.do">
+
+  <div class="contents_1" >
+    <div class="function_bottom">
+      <table class="list" style="width:96%">
+        <tr class="button">
+          <td style="background:none">
+            <div style="text-align:left">
+            
+              
+              
+              
+              
+              
+              
+                <input type="button" id="slbsskgrBack" onclick="return exec('showSearchBack',this,null)" value="前画面へ戻る" class="return decorate" />
+              
+            
+            </div>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  
+  <div class="caption">
+    <span class="h3 line3">講義一覧</span><br>
+  </div>
+
+  
+  <div class="caption">
+    <span class="image"></span>
+    <span class="h4 line4">シラバスを参照する講義名をクリックしてください。</span>
+  </div>
+
+  
+  <div class="contents_1">
+
+    <input type="hidden" name="buttonName" value=""/>
+<input type="hidden" name="timestamp" value="1775610025393"/>
+
+
+    
+      
+
+      
+
+      
+        　<br/>
+        <table class="list">
+          <tr class="link">
+            <td colspan="5" style="text-align:right">
+              <div class="left"></div>
+              <div class="right">
+                
+                  
+                  
+                  
+                  
+                  
+                
+
+
+
+
+
+
+
+
+
+<script language="javascript">
+<!--
+var pagingStart = false;
+function doPaging(formName, buttonName, pageParamName, pageCount, maxCountParamName, maxCount) {
+    var userAgent = window.navigator.userAgent.toLowerCase();
+    var waitTime = 0;
+
+    // Edgeブラウザーの場合
+    if(userAgent.indexOf('edge') != -1){
+        waitTime = 300;
+    }
+
+    setTimeout(function(){
+        if (pagingStart == false) {
+            pagingStart = true;
+            $(pageParamName).value = pageCount;
+            $(maxCountParamName).value = maxCount;
+            $("selectButtonName").name = buttonName;
+            $(formName).submit();
+        }
+    }, waitTime);
+}
+
+</script>
+
+
+
+
+
+
+ 
+      
+        <span>
+          1-10件表示/38件中
+        </span>
+ 
+        
+          <span>
+               
+
+                       
+
+            
+              
+                <b>1</b>
+              
+              
+            
+              
+                          
+                
+                  <a href="javascript:void(0);" onclick="doPaging('form','navigateKougiList','pageCount','2','maxCount','10');return false;">2</a>
+                
+                                
+              
+            
+              
+                          
+                
+                  <a href="javascript:void(0);" onclick="doPaging('form','navigateKougiList','pageCount','3','maxCount','10');return false;">3</a>
+                
+                                
+              
+            
+              
+                          
+                
+                  <a href="javascript:void(0);" onclick="doPaging('form','navigateKougiList','pageCount','4','maxCount','10');return false;">4</a>
+                
+                                
+              
+            
+
+            
+   
+                          
+              
+                <a href="javascript:void(0);" onclick="doPaging('form','navigateKougiList','pageCount','2','maxCount','10');return false;">次の10件&gt;&gt;</a>
+              
+              
+                          
+                       
+          </span>
+                
+       
+        
+          
+            <select name="maxDispListCount" onchange="doPaging('form','navigateKougiList','pageCount','','maxCount',this.value)" style="width:50px;"><option value="10" selected="selected">10</option>
+              
+                <option value="20">20</option>
+              
+                <option value="30">30</option>
+              
+                <option value="40">40</option>
+              
+                <option value="50">50</option>
+              
+                <option value="100">100</option>
+              
+                <option value="200">200</option></select>                
+          
+          
+          件表示
+        
+      
+      
+      
+      <input type="hidden" name="value(pageCount)" value="" id="pageCount">  
+      <input type="hidden" name="value(maxCount)" value="" id="maxCount">  
+      <input type="hidden" value="dummy" name="dummy" id="selectButtonName"/>
+
+                <div class="image" ></div>    
+              </div>
+            </td>
+          </tr>
+          <tr class="label">
+            <td style="white-space: nowrap;text-align:center" width="5%">No</td>
+            
+              <td style="white-space: nowrap;text-align:center" width="10%">講義コード</td>
+            
+            <td style="white-space: nowrap;text-align:center" width="25%">講義名</td>
+            
+            
+            
+              <td style="white-space: nowrap;text-align:center" width="20%">開講期間 曜日・時限</td>
+            
+            <td style="white-space: nowrap;text-align:center" width="15%">担当教員</td>
+          </tr>
+          
+            <tr class="column_odd" style="vertical-align:middle" >
+              <td style="text-align:center">1</td>
+              
+                <td style="text-align:center" >26533320</td>
+              
+              <td>
+                
+                <a href="/campusweb/slbssbdr.do?value(risyunen)=2026&value(semekikn)=1&value(kougicd)=26533320&value(crclumcd)=ZZ" >線形代数からはじめる量子力学</a>
+            </td>
+
+            
+
+            
+
+            
+              <td>春学期　水曜日　４時限</td>
+            
+
+            <td>平良　敬乃</td>
+          </tr>
+          
+            <tr class="column_even" style="vertical-align:middle" >
+              <td style="text-align:center">2</td>
+              
+                <td style="text-align:center" >26532118</td>
+              
+              <td>
+                
+                <a href="/campusweb/slbssbdr.do?value(risyunen)=2026&value(semekikn)=1&value(kougicd)=26532118&value(crclumcd)=" >線形代数学Ⅰ</a>
+            </td>
+
+            
+
+            
+
+            
+              <td>前期　火曜日　２時限</td>
+            
+
+            <td>佐藤　康彦</td>
+          </tr>
+          
+            <tr class="column_odd" style="vertical-align:middle" >
+              <td style="text-align:center">3</td>
+              
+                <td style="text-align:center" >26533117</td>
+              
+              <td>
+                
+                <a href="/campusweb/slbssbdr.do?value(risyunen)=2026&value(semekikn)=1&value(kougicd)=26533117&value(crclumcd)=" >線形代数学Ⅰ</a>
+            </td>
+
+            
+
+            
+
+            
+              <td>前期　水曜日　２時限</td>
+            
+
+            <td>翁　林</td>
+          </tr>
+          
+            <tr class="column_even" style="vertical-align:middle" >
+              <td style="text-align:center">4</td>
+              
+                <td style="text-align:center" >26533118</td>
+              
+              <td>
+                
+                <a href="/campusweb/slbssbdr.do?value(risyunen)=2026&value(semekikn)=1&value(kougicd)=26533118&value(crclumcd)=" >線形代数学Ⅰ</a>
+            </td>
+
+            
+
+            
+
+            
+              <td>前期　水曜日　２時限</td>
+            
+
+            <td>坂本　祥太</td>
+          </tr>
+          
+            <tr class="column_odd" style="vertical-align:middle" >
+              <td style="text-align:center">5</td>
+              
+                <td style="text-align:center" >26533220</td>
+              
+              <td>
+                
+                <a href="/campusweb/slbssbdr.do?value(risyunen)=2026&value(semekikn)=1&value(kougicd)=26533220&value(crclumcd)=" >線形代数学Ⅰ</a>
+            </td>
+
+            
+
+            
+
+            
+              <td>前期　水曜日　３時限</td>
+            
+
+            <td>松井　卓</td>
+          </tr>
+          
+            <tr class="column_even" style="vertical-align:middle" >
+              <td style="text-align:center">6</td>
+              
+                <td style="text-align:center" >26533221</td>
+              
+              <td>
+                
+                <a href="/campusweb/slbssbdr.do?value(risyunen)=2026&value(semekikn)=1&value(kougicd)=26533221&value(crclumcd)=" >線形代数学Ⅰ</a>
+            </td>
+
+            
+
+            
+
+            
+              <td>前期　水曜日　３時限</td>
+            
+
+            <td>溝口　佳寛</td>
+          </tr>
+          
+            <tr class="column_odd" style="vertical-align:middle" >
+              <td style="text-align:center">7</td>
+              
+                <td style="text-align:center" >26533222</td>
+              
+              <td>
+                
+                <a href="/campusweb/slbssbdr.do?value(risyunen)=2026&value(semekikn)=1&value(kougicd)=26533222&value(crclumcd)=" >線形代数学Ⅰ</a>
+            </td>
+
+            
+
+            
+
+            
+              <td>前期　水曜日　３時限</td>
+            
+
+            <td>稲濱　譲</td>
+          </tr>
+          
+            <tr class="column_even" style="vertical-align:middle" >
+              <td style="text-align:center">8</td>
+              
+                <td style="text-align:center" >26534016</td>
+              
+              <td>
+                
+                <a href="/campusweb/slbssbdr.do?value(risyunen)=2026&value(semekikn)=1&value(kougicd)=26534016&value(crclumcd)=" >線形代数学Ⅰ</a>
+            </td>
+
+            
+
+            
+
+            
+              <td>前期　木曜日　１時限</td>
+            
+
+            <td>平良　晃一</td>
+          </tr>
+          
+            <tr class="column_odd" style="vertical-align:middle" >
+              <td style="text-align:center">9</td>
+              
+                <td style="text-align:center" >26534115</td>
+              
+              <td>
+                
+                <a href="/campusweb/slbssbdr.do?value(risyunen)=2026&value(semekikn)=1&value(kougicd)=26534115&value(crclumcd)=" >線形代数学Ⅰ</a>
+            </td>
+
+            
+
+            
+
+            
+              <td>前期　木曜日　２時限</td>
+            
+
+            <td>福本　康秀</td>
+          </tr>
+          
+            <tr class="column_even" style="vertical-align:middle" >
+              <td style="text-align:center">10</td>
+              
+                <td style="text-align:center" >26534116</td>
+              
+              <td>
+                
+                <a href="/campusweb/slbssbdr.do?value(risyunen)=2026&value(semekikn)=1&value(kougicd)=26534116&value(crclumcd)=" >線形代数学Ⅰ</a>
+            </td>
+
+            
+
+            
+
+            
+              <td>前期　木曜日　２時限</td>
+            
+
+            <td>今野　拓也</td>
+          </tr>
+          
+
+          <tr class="link">
+            <td colspan="5" style="background:none">
+              <div class="left"></div>
+              <div class="right">
+                
+                  
+                  
+                  
+                  
+                  
+                
+
+
+
+
+
+
+
+
+
+<script language="javascript">
+<!--
+var pagingStart = false;
+function doPaging(formName, buttonName, pageParamName, pageCount, maxCountParamName, maxCount) {
+    var userAgent = window.navigator.userAgent.toLowerCase();
+    var waitTime = 0;
+
+    // Edgeブラウザーの場合
+    if(userAgent.indexOf('edge') != -1){
+        waitTime = 300;
+    }
+
+    setTimeout(function(){
+        if (pagingStart == false) {
+            pagingStart = true;
+            $(pageParamName).value = pageCount;
+            $(maxCountParamName).value = maxCount;
+            $("selectButtonName").name = buttonName;
+            $(formName).submit();
+        }
+    }, waitTime);
+}
+
+</script>
+
+
+
+
+
+
+ 
+      
+        <span>
+          1-10件表示/38件中
+        </span>
+ 
+        
+          <span>
+               
+
+                       
+
+            
+              
+                <b>1</b>
+              
+              
+            
+              
+                          
+                
+                  <a href="javascript:void(0);" onclick="doPaging('form','navigateKougiList','pageCount','2','maxCount','10');return false;">2</a>
+                
+                                
+              
+            
+              
+                          
+                
+                  <a href="javascript:void(0);" onclick="doPaging('form','navigateKougiList','pageCount','3','maxCount','10');return false;">3</a>
+                
+                                
+              
+            
+              
+                          
+                
+                  <a href="javascript:void(0);" onclick="doPaging('form','navigateKougiList','pageCount','4','maxCount','10');return false;">4</a>
+                
+                                
+              
+            
+
+            
+   
+                          
+              
+                <a href="javascript:void(0);" onclick="doPaging('form','navigateKougiList','pageCount','2','maxCount','10');return false;">次の10件&gt;&gt;</a>
+              
+              
+                          
+                       
+          </span>
+                
+       
+        
+          
+            <select name="maxDispListCount" onchange="doPaging('form','navigateKougiList','pageCount','','maxCount',this.value)" style="width:50px;"><option value="10" selected="selected">10</option>
+              
+                <option value="20">20</option>
+              
+                <option value="30">30</option>
+              
+                <option value="40">40</option>
+              
+                <option value="50">50</option>
+              
+                <option value="100">100</option>
+              
+                <option value="200">200</option></select>                
+          
+          
+          件表示
+        
+      
+      
+      
+      <input type="hidden" name="value(pageCount)" value="" id="pageCount">  
+      <input type="hidden" name="value(maxCount)" value="" id="maxCount">  
+      <input type="hidden" value="dummy" name="dummy" id="selectButtonName"/>
+
+                <div class="image" ></div>    
+              </div>
+            </td>
+          </tr>
+        </table>
+
+        　<br/>
+      
+    
+
+    <div class="function_bottom">
+      <table class="list" style="width:96%">
+        <tr class="button">
+          <td style="background:none">
+            <div style="text-align:left">
+              
+                
+                
+                
+                
+                
+                
+                  <input type="button" id="slbsskgrBack" onclick="return exec('showSearchBack',this,null)" value="前画面へ戻る" class="return decorate" />
+                
+              
+            </div>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </div>
+</form>
+
+</td>
+      
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<td id="sub1">
+  <div id="navigation">
+   
+   
+      
+      
+   
+
+  
+  
+  </div>
+  <div id="dummy"></div>
+  <br class="clear" />
+</td>
+
+    </tr>
+  </table>
+</div>
+
+<p id="pageTopButton">
+  <a href="#wrap" id="pageTopLink">PAGE TOP</a>
+</p>
+
+
+
+
+  <noscript><c:out value="JavaScriptを使用できる環境でご利用ください。" /></noscript>
+  <div id="footer">
+    <div class="text">Copyright FUJITSU LIMITED 2005-2014</div>
+  </div>
+
+</div>
+</body>
+</html>
+

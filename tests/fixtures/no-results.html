@@ -1,0 +1,1708 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja" lang="ja">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="Content-Language" content="ja" />
+    <meta http-equiv="Content-Script-Type" content="text/javascript" />
+    <meta http-equiv="Content-Style-Type" content="text/css" />
+    <meta name="format-detection" content="telephone=no"/>
+    <title>
+    
+    
+      Campusmate
+    
+    </title>
+
+
+    <script>
+      var waitingMessage = "お待ちください...";
+      var showBlockAlartMessage = "処理中です。しばらくお待ちください。";
+      var sessionExpirationAlertMessage = "まもなくセッションタイムアウトします。下のボタンからセッションタイムアウトを回避できます。";
+      var sessionContinuationButton = "セッションを継続する";
+      var sessionExpirationNotifyMessage = "セッションタイムアウトした恐れがあります。画面上の設定、若しくは入力内容があればお手元に控えた上で、再度ログインしてください。";
+      var closeAlertDialog = "閉じる";
+      var ajaxRequestError = "エラーが発生しました";
+      var addListenerError = "お使いのブラウザは対応していません。";
+      var noFoundResourceError = "存在しないファイルが指定されています。指定し直して下さい。";
+    </script>
+
+    <link rel="stylesheet" href="./css/superTables.css" type="text/css" media="screen" charset="utf-8" />
+    <link rel="stylesheet" href="./css/timepicker.css" type="text/css" charset="utf-8"/>
+    <link rel="stylesheet" href="./css/visualize.css" type="text/css" charset="utf-8" /> 
+    <link rel="stylesheet" href="./css/visualize-light.css" type="text/css" charset="utf-8" /> 
+    <link rel="stylesheet" href="./css/jquery.ui.slider.css" type="text/css" charset="utf-8" /> 
+    <link rel="stylesheet" href="./css/design01/common.css" type="text/css" media="screen" charset="utf-8" />
+    <link rel="stylesheet" href="./css/design01/theme.css" type="text/css" media="screen" charset="utf-8" />
+    <!--<link rel="stylesheet" href="./css/design01/common_en.css" type="text/css" media="screen" charset="utf-8" />-->
+    <!--<link rel="stylesheet" href="./css/design01/theme_en.css" type="text/css" media="screen" charset="utf-8" />-->
+    <link rel="stylesheet" href="./css/design01/common_print.css" type="text/css" media="print" charset="utf-8" />
+    <link rel="stylesheet" href="./css/design01/theme_print.css" type="text/css" media="print" charset="utf-8" />
+    <!--<link rel="stylesheet" href="./css/design01/theme_print_en.css" type="text/css" media="print" charset="utf-8" />-->
+    <link rel="stylesheet" href="./css/design01/jquery-ui-custom.css" type="text/css" charset="utf-8" /> 
+
+    <script language="JavaScript" type="text/JavaScript" src="./js/prototype.js"></script>
+    <script language="JavaScript" type="text/JavaScript" src="./js/effects.js"></script>
+    <script language="JavaScript" type="text/JavaScript" src="./js/dragdrop.js"></script>
+    <script language="JavaScript" type="text/JavaScript" src="./js/main.js"></script>
+    <script language="JavaScript" type="text/javascript" src="./js/superTables.js"></script>
+<!--[if IE]>
+    
+    <script language="JavaScript" type="text/JavaScript" src="./js/excanvas.js"></script>
+<![endif]-->
+
+    <script language="JavaScript" type="text/JavaScript" src="./js/jquery.js"></script>
+    <script type="text/javascript">jQuery.noConflict();var jq$ = jQuery;</script>
+    <script language="JavaScript" type="text/JavaScript" src="./js/jquery.ui.core.js"></script>
+    <script language="JavaScript" type="text/JavaScript" src="./js/jquery.ui.widget.js"></script>
+    <script language="JavaScript" type="text/JavaScript" src="./js/jquery.ui.button.js"></script>
+    <script language="JavaScript" type="text/JavaScript" src="./js/jquery.ui.mouse.js"></script>
+    <script language="JavaScript" type="text/JavaScript" src="./js/jquery.ui.slider.js"></script>
+    <script language="JavaScript" type="text/JavaScript" src="./js/jquery.ui.draggable.js"></script>
+    <script language="JavaScript" type="text/JavaScript" src="./js/jquery.ui.position.js"></script>
+    <script language="JavaScript" type="text/JavaScript" src="./js/jquery.ui.dialog.js"></script>
+    <script language="JavaScript" type="text/JavaScript" src="./js/jquery.tablefix.js"></script>
+    <script language="JavaScript" type="text/JavaScript" src="./js/date.js"></script>
+    <script language="JavaScript" type="text/JavaScript" src="./js/design01/common.js"></script>
+    <script language="JavaScript" type="text/JavaScript" src="./js/design01/theme.js"></script>
+    <script language="JavaScript" type="text/JavaScript" src="./js/jquery.ui.datepicker.js"></script>
+    <script language="JavaScript" type="text/JavaScript" src="./js/jquery.ui.datepicker-ja.js"></script>
+    <script language="JavaScript" type="text/JavaScript" src="./js/jquery.timePicker.js"></script>
+    <script language="JavaScript" type="text/JavaScript" src="./js/jquery.blockUI.js"></script>
+    <script language="JavaScript" type="text/JavaScript" src="./js/jquery.mousewheel.js"></script>
+    <script language="JavaScript" type="text/JavaScript" src="./js/main_jq.js"></script>
+    <script language="JavaScript" type="text/JavaScript" src="./js/jquery.upload.js"></script>
+    <script language="JavaScript" type="text/JavaScript" src="./js/visualize.jQuery.js"></script>
+    <script language="javascript" type="text/javascript">
+    <!--
+      restoreScreenState('', '', '');
+      
+      
+      if (false) {
+          monitoringSessionExpiration = startSessionExpirationMonitoring(3600, 600, 10);
+          monitoringSessionExpiration.initializeTimer();
+          window.addEventListener('resize', function(eve){
+              var resizeTimer = false;
+              if (resizeTimer !== false) {
+                  clearTimeout(resizeTimer);
+              }
+              resizeTimer = setTimeout(function() {
+                  monitoringSessionExpiration.resetPositioning();
+              }, 50);
+          }, false);
+      }
+    //-->
+    </script>
+
+  </head>
+
+<body>
+<div id="container">
+<div id="header">
+  
+  
+  <div id="head_top"></div>
+  <div id="head_left"></div>
+  <div id="head_right">
+    <div class="button">
+      
+      <input name="f_large" type="button" id="f_large" />
+      <input name="f_middle" type="button" id="f_middle" />
+      <input name="f_small" type="button" id="f_small" />
+      
+        <span id="help_space"> </span>
+        <span id="logout_space"> </span>
+        
+      
+      
+    </div>
+  </div>
+  <div class="clear"></div>
+  <div id="head_base"></div>
+  
+  <div id="top_menu">
+    <ul id="nav">
+
+      
+      
+        <li class="menu_end">
+        </li>
+      
+
+    </ul>
+    <br class="clear" />
+  </div>
+</div>
+
+<div id="content">
+  <table cellpadding="0" cellspacing="0" summary="layout">
+    <tr>
+      
+      
+
+
+
+
+
+
+
+
+
+
+<div id="login_inf_print">
+  <div class="top"></div>
+  <div class="mid">
+    
+    <ul class="user">
+    </ul>
+  
+  </div>
+  <div class="under"></div>
+</div>
+
+
+      
+      
+
+
+
+
+
+
+
+<td id="main">
+  
+    
+    <div id="title">
+      <h2>
+        講義から検索
+      </h2>
+    </div>
+    
+  
+
+
+
+
+
+
+
+
+<link href="./css/syllabus/syllabus.css" rel="stylesheet" type="text/css">
+
+
+<SCRIPT language="javascript">
+<!--
+function doCrclumSearch(form) {
+  document.getElementById("methodname").value = "crcsearch";
+  return true;
+}
+
+function doReload(thisObj) {
+  document.getElementById("methodname").value = "search";
+  exec('reloadSearchKougi', thisObj);
+}
+
+var jigenList = new Array();
+
+  jigenList[0] = '10';
+
+  jigenList[1] = '20';
+
+  jigenList[2] = '30';
+
+  jigenList[3] = '40';
+
+  jigenList[4] = '50';
+
+  jigenList[5] = '60';
+
+  jigenList[6] = '70';
+
+  jigenList[7] = '80';
+
+  jigenList[8] = 'ZZ';
+
+
+/*-- 指定された週 全てのチェックを入れる（または外す） --------------------*/
+function checked_yobi(yobiId) {
+
+  var obj, obj2;
+  var i;
+
+  obj2 = document.getElementById("SB." + yobiId);
+
+  for (i = 0; i < jigenList.length; i++) {
+     obj = document.getElementById(jigenList[i] + "." + yobiId);
+     if (obj == null) continue;
+     obj.checked = obj2.checked;
+  }
+}
+
+function submitForm() {
+  if (event.keyCode == 13) {
+//    var obj = document.getElementById("form");
+//    obj.click();
+  }
+}
+
+window.document.onkeydown = submitForm;
+//-->
+</SCRIPT>
+
+<form name="sylbsActionForm" id="form" method="post" action="/campusweb/slbsskgr.do">
+
+  
+  
+
+  
+  <div class="caption">
+    <span class="h3 line3">検索条件</span><br>
+  </div>
+
+  
+  <div class="caption">
+    <span class="image"></span>
+    <span class="h4 line4">シラバスを検索する年度を選択し、各検索条件を入力して検索してください。</span>
+  </div>
+
+  
+  <table class="tbl">
+    <tr>
+      <td style="padding-left:25px" align="left">
+        <br>現在、障害があり、通常の方法による授業を受けることが困難な場合は、教育目的の本質的な変更など過重な負担を伴わない限り、合理的配慮を受けることができます。<br>希望する学生は、以下の相談窓口（又は授業を担当する教員）に相談してください。<br><br>＜相談窓口＞ キャンパスライフ・健康支援センター　インクルージョン支援推進室<br>（伊都地区センター１号館１階）<br>（電話：092-802-5859　FAX：092-802-5895　E-mail：inclusion@chc.kyushu-u.ac.jp）<br><br>実務経験を有する授業担当者の講義を検索したい場合は全文検索機能で「授業担当者の実務経験有」と入力して検索してください。
+      </td>
+    </tr>
+  </table>
+  
+
+  
+  <table class="tbl">
+    <tr>
+      <td align="left">
+        
+        
+        <br><br>2015年度以前のシラバスの検索を行う場合、開講学部・学府、講義名称、使用言語からの検索のみ可能です。
+        
+      </td>
+    </tr>
+  </table>
+  
+
+  <div class="contents_1" >
+
+    <input type="hidden" id = "methodname" name="value(methodname)" value="sylkougi_search"/>
+    <input type="hidden" name="buttonName" value=""/>
+<input type="hidden" name="timestamp" value="1775610117644"/>
+
+
+    <table class="tbl">
+      <tr>
+        <td align="left"><font color="red">検索結果は0件です。</font><br></td>
+      </tr>
+    </table>
+
+    <div class="function_bottom">
+      <table class="list" style="margin:0px;width:100%" >
+        <tr class="button">
+          
+          <td style="background:none">
+            <div style="text-align:right">
+              <input type="button" id="skgr_search" onclick="return exec('searchKougi',this,null)" value="シラバスを検索する" class="search decorate" />
+            </div>
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <table class="form" style="margin-top:10px">
+      
+      <tr>
+        <td class="label" width="25%">年度</td>
+        <td class="line_y_label"></td>
+        <td class="item">
+          <select name="value(nendo)"><option value="2026" selected="selected">2026</option>
+<option value="2025">2025</option>
+<option value="2024">2024</option>
+<option value="2023">2023</option>
+<option value="2022">2022</option>
+<option value="2021">2021</option>
+<option value="2020">2020</option>
+<option value="2019">2019</option>
+<option value="2018">2018</option>
+<option value="2017">2017</option>
+<option value="2016">2016</option>
+<option value="2015">2015</option>
+<option value="2014">2014</option>
+<option value="2013">2013</option>
+<option value="2012">2012</option>
+<option value="2011">2011</option>
+<option value="2010">2010</option>
+<option value="2009">2009</option>
+<option value="2008">2008</option>
+<option value="2007">2007</option>
+<option value="2006">2006</option></select>
+          年度
+        </td>
+      </tr>
+      <tr><td class="line_x" colspan="3"></td></tr>
+
+      
+      <tr>
+        <td class="label">キャンパス</td>
+        <td class="line_y_label"></td>
+        <td class="item">
+          <select name="value(campuscd)"><option value="">--未選択--</option>
+            <option value="01">伊都地区</option>
+<option value="07">箱崎地区</option>
+<option value="02">病院地区</option>
+<option value="03">筑紫地区</option>
+<option value="04">大橋地区</option>
+<option value="06">六本松地区</option>
+<option value="99">＿</option></select>
+        </td>
+      </tr>
+      <tr><td class="line_x" colspan="3"></td></tr>
+
+      
+      <tr>
+        <td class="label">開講学部・学府</td>
+        <td class="line_y_label"></td>
+        <td class="item">
+            
+            
+              <input type="checkbox" name="values(multiKaikoSyozoku)" value="001" id="基幹教育">
+              基幹教育&nbsp
+              
+              
+              
+              
+              
+              
+              
+              
+                
+                
+              
+              
+            
+              <input type="checkbox" name="values(multiKaikoSyozoku)" value="120" id="共創学部">
+              共創学部&nbsp
+              
+              
+              
+              
+              
+              
+              
+              
+                
+                
+              
+              
+            
+              <input type="checkbox" name="values(multiKaikoSyozoku)" value="010" id="文学部">
+              文学部&nbsp
+              
+              
+              
+              
+              
+              
+              
+              
+                
+                
+              
+              
+            
+              <input type="checkbox" name="values(multiKaikoSyozoku)" value="020" id="教育学部">
+              教育学部&nbsp
+              
+              
+              
+              
+              
+              
+              
+              
+                
+                
+              
+              
+            
+              <input type="checkbox" name="values(multiKaikoSyozoku)" value="030" id="法学部">
+              法学部&nbsp
+              
+              
+              
+              
+              
+              
+              
+              
+                
+                
+              
+              
+            
+              <input type="checkbox" name="values(multiKaikoSyozoku)" value="040" id="経済学部">
+              経済学部&nbsp
+              
+              
+              
+              
+              
+              
+              
+              
+                
+                
+                  <br></br>
+                  
+                
+              
+              
+            
+              <input type="checkbox" name="values(multiKaikoSyozoku)" value="050" id="理学部">
+              理学部&nbsp
+              
+              
+              
+              
+              
+              
+              
+              
+                
+                
+              
+              
+            
+              <input type="checkbox" name="values(multiKaikoSyozoku)" value="061" id="医学部医学科">
+              医学部医学科&nbsp
+              
+              
+              
+              
+              
+              
+              
+              
+                
+                
+              
+              
+            
+              <input type="checkbox" name="values(multiKaikoSyozoku)" value="062" id="医学部生命科学科">
+              医学部生命科学科&nbsp
+              
+              
+              
+              
+              
+              
+              
+              
+                
+                
+              
+              
+            
+              <input type="checkbox" name="values(multiKaikoSyozoku)" value="063" id="医学部保健学科">
+              医学部保健学科&nbsp
+              
+              
+              
+              
+              
+              
+              
+              
+                
+                
+                  <br></br>
+                  
+                
+              
+              
+            
+              <input type="checkbox" name="values(multiKaikoSyozoku)" value="070" id="歯学部">
+              歯学部&nbsp
+              
+              
+              
+              
+              
+              
+              
+              
+                
+                
+              
+              
+            
+              <input type="checkbox" name="values(multiKaikoSyozoku)" value="080" id="薬学部">
+              薬学部&nbsp
+              
+              
+              
+              
+              
+              
+              
+              
+                
+                
+              
+              
+            
+              <input type="checkbox" name="values(multiKaikoSyozoku)" value="090" id="工学部">
+              工学部&nbsp
+              
+              
+              
+              
+              
+              
+              
+              
+                
+                
+              
+              
+            
+              <input type="checkbox" name="values(multiKaikoSyozoku)" value="105" id="芸術工学部">
+              芸術工学部&nbsp
+              
+              
+              
+              
+              
+              
+              
+              
+                
+                
+              
+              
+            
+              <input type="checkbox" name="values(multiKaikoSyozoku)" value="100" id="農学部">
+              農学部&nbsp
+              
+              
+              
+              
+              
+              
+              
+              
+                
+                
+                  <br></br>
+                  
+                
+              
+              
+            
+              <input type="checkbox" name="values(multiKaikoSyozoku)" value="110" id="２１世紀プログラム課程">
+              ２１世紀プログラム課程&nbsp
+              
+              
+              
+              
+              
+              
+              
+              
+                
+                
+              
+              
+            
+              <input type="checkbox" name="values(multiKaikoSyozoku)" value="0201" id="教職課程（教職に関する科目）">
+              教職課程（教職に関する科目）&nbsp
+              
+              
+              
+              
+              
+              
+              
+              
+                
+                
+              
+              
+            
+              <input type="checkbox" name="values(multiKaikoSyozoku)" value="005" id="全学教育">
+              全学教育&nbsp
+              
+              
+              
+              
+              
+              
+              
+              
+                
+                
+                  <br></br>
+                  
+                
+              
+              
+            
+              <input type="checkbox" name="values(multiKaikoSyozoku)" value="501" id="大学院基幹教育">
+              大学院基幹教育&nbsp
+              
+              
+              
+              
+              
+              
+              
+              
+                
+                
+              
+              
+            
+              <input type="checkbox" name="values(multiKaikoSyozoku)" value="520" id="人文科学府">
+              人文科学府&nbsp
+              
+              
+              
+              
+              
+              
+              
+              
+                
+                
+              
+              
+            
+              <input type="checkbox" name="values(multiKaikoSyozoku)" value="690" id="地球社会統合科学府">
+              地球社会統合科学府&nbsp
+              
+              
+              
+              
+              
+              
+              
+              
+                
+                
+              
+              
+            
+              <input type="checkbox" name="values(multiKaikoSyozoku)" value="530" id="人間環境学府">
+              人間環境学府&nbsp
+              
+              
+              
+              
+              
+              
+              
+              
+                
+                
+                  <br></br>
+                  
+                
+              
+              
+            
+              <input type="checkbox" name="values(multiKaikoSyozoku)" value="550" id="経済学府">
+              経済学府&nbsp
+              
+              
+              
+              
+              
+              
+              
+              
+                
+                
+              
+              
+            
+              <input type="checkbox" name="values(multiKaikoSyozoku)" value="540" id="法学府">
+              法学府&nbsp
+              
+              
+              
+              
+              
+              
+              
+              
+                
+                
+              
+              
+            
+              <input type="checkbox" name="values(multiKaikoSyozoku)" value="560" id="理学府">
+              理学府&nbsp
+              
+              
+              
+              
+              
+              
+              
+              
+                
+                
+              
+              
+            
+              <input type="checkbox" name="values(multiKaikoSyozoku)" value="570" id="数理学府">
+              数理学府&nbsp
+              
+              
+              
+              
+              
+              
+              
+              
+                
+                
+              
+              
+            
+              <input type="checkbox" name="values(multiKaikoSyozoku)" value="650" id="システム生命科学府">
+              システム生命科学府&nbsp
+              
+              
+              
+              
+              
+              
+              
+              
+                
+                
+                  <br></br>
+                  
+                
+              
+              
+            
+              <input type="checkbox" name="values(multiKaikoSyozoku)" value="581" id="医学系学府医学専攻">
+              医学系学府医学専攻&nbsp
+              
+              
+              
+              
+              
+              
+              
+              
+                
+                
+              
+              
+            
+              <input type="checkbox" name="values(multiKaikoSyozoku)" value="5812" id="医学系学府医科学専攻">
+              医学系学府医科学専攻&nbsp
+              
+              
+              
+              
+              
+              
+              
+              
+                
+                
+              
+              
+            
+              <input type="checkbox" name="values(multiKaikoSyozoku)" value="583" id="医学系学府保健学専攻">
+              医学系学府保健学専攻&nbsp
+              
+              
+              
+              
+              
+              
+              
+              
+                
+                
+                  <br></br>
+                  
+                
+              
+              
+            
+              <input type="checkbox" name="values(multiKaikoSyozoku)" value="5814" id="医学系学府医療経営・管理学専攻">
+              医学系学府医療経営・管理学専攻&nbsp
+              
+              
+              
+              
+              
+              
+              
+              
+                
+                
+              
+              
+            
+              <input type="checkbox" name="values(multiKaikoSyozoku)" value="590" id="歯学府">
+              歯学府&nbsp
+              
+              
+              
+              
+              
+              
+              
+              
+                
+                
+              
+              
+            
+              <input type="checkbox" name="values(multiKaikoSyozoku)" value="600" id="薬学府">
+              薬学府&nbsp
+              
+              
+              
+              
+              
+              
+              
+              
+                
+                
+              
+              
+            
+              <input type="checkbox" name="values(multiKaikoSyozoku)" value="610" id="工学府">
+              工学府&nbsp
+              
+              
+              
+              
+              
+              
+              
+              
+                
+                
+                  <br></br>
+                  
+                
+              
+              
+            
+              <input type="checkbox" name="values(multiKaikoSyozoku)" value="660" id="芸術工学府">
+              芸術工学府&nbsp
+              
+              
+              
+              
+              
+              
+              
+              
+                
+                
+              
+              
+            
+              <input type="checkbox" name="values(multiKaikoSyozoku)" value="620" id="システム情報科学府">
+              システム情報科学府&nbsp
+              
+              
+              
+              
+              
+              
+              
+              
+                
+                
+              
+              
+            
+              <input type="checkbox" name="values(multiKaikoSyozoku)" value="630" id="総合理工学府">
+              総合理工学府&nbsp
+              
+              
+              
+              
+              
+              
+              
+              
+                
+                
+                  <br></br>
+                  
+                
+              
+              
+            
+              <input type="checkbox" name="values(multiKaikoSyozoku)" value="640" id="生物資源環境科学府">
+              生物資源環境科学府&nbsp
+              
+              
+              
+              
+              
+              
+              
+              
+                
+                
+              
+              
+            
+              <input type="checkbox" name="values(multiKaikoSyozoku)" value="680" id="統合新領域学府">
+              統合新領域学府&nbsp
+              
+              
+              
+              
+              
+              
+              
+              
+                
+                
+                  <br></br>
+                  
+                
+              
+              
+            
+              <input type="checkbox" name="values(multiKaikoSyozoku)" value="700" id="マス・フォア・イノベーション連係学府">
+              マス・フォア・イノベーション連係学府&nbsp
+              
+              
+              
+              
+              
+              
+              
+              
+                
+                
+                  <br></br>
+                  
+                
+              
+              
+            
+              <input type="checkbox" name="values(multiKaikoSyozoku)" value="820" id="マス・フォア・イノベーション卓越大学院">
+              マス・フォア・イノベーション卓越大学院&nbsp
+              
+              
+              
+              
+              
+              
+              
+              
+                
+                
+              
+              
+            
+              <input type="checkbox" name="values(multiKaikoSyozoku)" value="710" id="人文情報連係学府">
+              人文情報連係学府&nbsp
+              
+              
+              
+              
+              
+              
+              
+              
+                
+                
+                  <br></br>
+                  
+                
+              
+              
+            
+              <input type="checkbox" name="values(multiKaikoSyozoku)" value="830" id="未来共創リーダー育成プログラム">
+              未来共創リーダー育成プログラム&nbsp
+              
+              
+              
+              
+              
+              
+              
+              
+                
+                
+                  <br></br>
+                  
+                
+              
+              
+            
+              <input type="checkbox" name="values(multiKaikoSyozoku)" value="840" id="次世代研究者挑戦的研究プログラム未来創造">
+              次世代研究者挑戦的研究プログラム未来創造&nbsp
+              
+              
+              
+              
+              
+              
+              
+              
+                
+                
+              
+              
+            
+              <input type="checkbox" name="values(multiKaikoSyozoku)" value="850" id="留学生センター">
+              留学生センター&nbsp
+              
+              
+              
+              
+              
+              
+              
+              
+              
+            
+        </td>
+      </tr>
+      <tr><td class="line_x" colspan="3"></td></tr>
+
+      
+      
+              
+              
+              
+
+      
+      
+
+      
+      
+
+      
+      <tr>
+        <td class="label">講義名称</td>
+        <td class="line_y_label"></td>
+        <td class="item"><input type="text" name="value(kouginm)" size="50" value="xyznonexistent999zzz"></td>
+      </tr>
+      <tr><td class="line_x" colspan="3"></td></tr>
+
+      
+      <tr>
+        <td class="label">担当教員</td>
+        <td class="line_y_label"></td>
+        <td class="item"><input type="text" name="value(syokunm)" size="50" value=""></td>
+      </tr>
+      <tr><td class="line_x" colspan="3"></td></tr>
+
+      
+      <tr>
+        <td class="label">開講時期</td>
+        <td class="line_y_label"></td>
+        <td class="item">
+          <select name="value(kaikoCd)"><option value="">--未選択--</option>
+            <option value="00">通年</option>
+<option value="91">通年集中</option>
+<option value="10">前</option>
+<option value="11">前期前半</option>
+<option value="12">前期後半</option>
+<option value="13">春学期</option>
+<option value="14">夏学期</option>
+<option value="92">前期集中</option>
+<option value="20">後</option>
+<option value="21">後期前半</option>
+<option value="22">後期後半</option>
+<option value="23">秋学期</option>
+<option value="24">冬学期</option>
+<option value="93">後期集中</option>
+<option value="95">春期</option>
+<option value="97">春期集中</option>
+<option value="96">秋期</option>
+<option value="98">秋期集中</option></select>
+        </td>
+      </tr>
+      <tr><td class="line_x" colspan="3"></td></tr>
+
+      
+      <tr>
+        <td class="label">科目ナンバリングコード</td>
+        <td class="line_y_label"></td>
+        <td class="item"><input type="text" name="value(kamokuNumber)" size="50" value=""></td>
+      </tr>
+      <tr><td class="line_x" colspan="3"></td></tr>
+
+      
+      <tr>
+        <td class="label">使用言語</td>
+        <td class="line_y_label"></td>
+        <td class="item">
+          <select name="value(siyouGengo)"><option value="">--未選択--</option>
+            <option value="J">日本語</option>
+<option value="E">英語</option>
+<option value="M">英語以外の外国語</option>
+<option value="EJ">英語及び日本語を併用</option>
+<option value="MJ">英語以外の外国語及び日本語を併</option>
+<option value="EM">英語及び英語以外の外国語を併用</option></select>
+        </td>
+      </tr>
+      <tr><td class="line_x" colspan="3"></td></tr>
+
+      
+      <tr>
+        <td class="label">曜日・時限</td>
+        <td class="line_y_label"></td>
+        <td class="item">
+          <table border="1" cellpadding="3" cellspacing="0"  width="75%">
+            <tr>
+              <th align="center" width="9%">&nbsp;</th>
+
+              
+              <th align="center" width="9%">
+                月<br><input type="checkbox" id="SB.1" name="SB.1" onClick="JavaScript:checked_yobi('1');">
+              </th>
+              
+              <th align="center" width="9%">
+                火<br><input type="checkbox" id="SB.2" name="SB.2" onClick="JavaScript:checked_yobi('2');">
+              </th>
+              
+              <th align="center" width="9%">
+                水<br><input type="checkbox" id="SB.3" name="SB.3" onClick="JavaScript:checked_yobi('3');">
+              </th>
+              
+              <th align="center" width="9%">
+                木<br><input type="checkbox" id="SB.4" name="SB.4" onClick="JavaScript:checked_yobi('4');">
+              </th>
+              
+              <th align="center" width="9%">
+                金<br><input type="checkbox" id="SB.5" name="SB.5" onClick="JavaScript:checked_yobi('5');">
+              </th>
+              
+              <th align="center" width="9%">
+                土<br><input type="checkbox" id="SB.6" name="SB.6" onClick="JavaScript:checked_yobi('6');">
+              </th>
+              
+              <th align="center" width="9%">
+                他<br><input type="checkbox" id="SB.Z" name="SB.Z" onClick="JavaScript:checked_yobi('Z');">
+              </th>
+              
+            </tr>
+
+            
+              
+              <tr>
+                <th align="center">
+                  １&nbsp;
+                </th>
+
+                
+                  
+                  <td align="center">
+                    <input type="checkbox" name="values(multiDates)" value="10.1" id="10.1">
+                  </td>
+                
+                  
+                  <td align="center">
+                    <input type="checkbox" name="values(multiDates)" value="10.2" id="10.2">
+                  </td>
+                
+                  
+                  <td align="center">
+                    <input type="checkbox" name="values(multiDates)" value="10.3" id="10.3">
+                  </td>
+                
+                  
+                  <td align="center">
+                    <input type="checkbox" name="values(multiDates)" value="10.4" id="10.4">
+                  </td>
+                
+                  
+                  <td align="center">
+                    <input type="checkbox" name="values(multiDates)" value="10.5" id="10.5">
+                  </td>
+                
+                  
+                  <td align="center">
+                    <input type="checkbox" name="values(multiDates)" value="10.6" id="10.6">
+                  </td>
+                
+                  
+                  <td align="center">
+                    <input type="checkbox" name="values(multiDates)" value="10.Z" id="10.Z">
+                  </td>
+                
+              </tr>
+            
+              
+              <tr>
+                <th align="center">
+                  ２&nbsp;
+                </th>
+
+                
+                  
+                  <td align="center">
+                    <input type="checkbox" name="values(multiDates)" value="20.1" id="20.1">
+                  </td>
+                
+                  
+                  <td align="center">
+                    <input type="checkbox" name="values(multiDates)" value="20.2" id="20.2">
+                  </td>
+                
+                  
+                  <td align="center">
+                    <input type="checkbox" name="values(multiDates)" value="20.3" id="20.3">
+                  </td>
+                
+                  
+                  <td align="center">
+                    <input type="checkbox" name="values(multiDates)" value="20.4" id="20.4">
+                  </td>
+                
+                  
+                  <td align="center">
+                    <input type="checkbox" name="values(multiDates)" value="20.5" id="20.5">
+                  </td>
+                
+                  
+                  <td align="center">
+                    <input type="checkbox" name="values(multiDates)" value="20.6" id="20.6">
+                  </td>
+                
+                  
+                  <td align="center">
+                    <input type="checkbox" name="values(multiDates)" value="20.Z" id="20.Z">
+                  </td>
+                
+              </tr>
+            
+              
+              <tr>
+                <th align="center">
+                  ３&nbsp;
+                </th>
+
+                
+                  
+                  <td align="center">
+                    <input type="checkbox" name="values(multiDates)" value="30.1" id="30.1">
+                  </td>
+                
+                  
+                  <td align="center">
+                    <input type="checkbox" name="values(multiDates)" value="30.2" id="30.2">
+                  </td>
+                
+                  
+                  <td align="center">
+                    <input type="checkbox" name="values(multiDates)" value="30.3" id="30.3">
+                  </td>
+                
+                  
+                  <td align="center">
+                    <input type="checkbox" name="values(multiDates)" value="30.4" id="30.4">
+                  </td>
+                
+                  
+                  <td align="center">
+                    <input type="checkbox" name="values(multiDates)" value="30.5" id="30.5">
+                  </td>
+                
+                  
+                  <td align="center">
+                    <input type="checkbox" name="values(multiDates)" value="30.6" id="30.6">
+                  </td>
+                
+                  
+                  <td align="center">
+                    <input type="checkbox" name="values(multiDates)" value="30.Z" id="30.Z">
+                  </td>
+                
+              </tr>
+            
+              
+              <tr>
+                <th align="center">
+                  ４&nbsp;
+                </th>
+
+                
+                  
+                  <td align="center">
+                    <input type="checkbox" name="values(multiDates)" value="40.1" id="40.1">
+                  </td>
+                
+                  
+                  <td align="center">
+                    <input type="checkbox" name="values(multiDates)" value="40.2" id="40.2">
+                  </td>
+                
+                  
+                  <td align="center">
+                    <input type="checkbox" name="values(multiDates)" value="40.3" id="40.3">
+                  </td>
+                
+                  
+                  <td align="center">
+                    <input type="checkbox" name="values(multiDates)" value="40.4" id="40.4">
+                  </td>
+                
+                  
+                  <td align="center">
+                    <input type="checkbox" name="values(multiDates)" value="40.5" id="40.5">
+                  </td>
+                
+                  
+                  <td align="center">
+                    <input type="checkbox" name="values(multiDates)" value="40.6" id="40.6">
+                  </td>
+                
+                  
+                  <td align="center">
+                    <input type="checkbox" name="values(multiDates)" value="40.Z" id="40.Z">
+                  </td>
+                
+              </tr>
+            
+              
+              <tr>
+                <th align="center">
+                  ５&nbsp;
+                </th>
+
+                
+                  
+                  <td align="center">
+                    <input type="checkbox" name="values(multiDates)" value="50.1" id="50.1">
+                  </td>
+                
+                  
+                  <td align="center">
+                    <input type="checkbox" name="values(multiDates)" value="50.2" id="50.2">
+                  </td>
+                
+                  
+                  <td align="center">
+                    <input type="checkbox" name="values(multiDates)" value="50.3" id="50.3">
+                  </td>
+                
+                  
+                  <td align="center">
+                    <input type="checkbox" name="values(multiDates)" value="50.4" id="50.4">
+                  </td>
+                
+                  
+                  <td align="center">
+                    <input type="checkbox" name="values(multiDates)" value="50.5" id="50.5">
+                  </td>
+                
+                  
+                  <td align="center">
+                    <input type="checkbox" name="values(multiDates)" value="50.6" id="50.6">
+                  </td>
+                
+                  
+                  <td align="center">
+                    <input type="checkbox" name="values(multiDates)" value="50.Z" id="50.Z">
+                  </td>
+                
+              </tr>
+            
+              
+              <tr>
+                <th align="center">
+                  ６&nbsp;
+                </th>
+
+                
+                  
+                  <td align="center">
+                    <input type="checkbox" name="values(multiDates)" value="60.1" id="60.1">
+                  </td>
+                
+                  
+                  <td align="center">
+                    <input type="checkbox" name="values(multiDates)" value="60.2" id="60.2">
+                  </td>
+                
+                  
+                  <td align="center">
+                    <input type="checkbox" name="values(multiDates)" value="60.3" id="60.3">
+                  </td>
+                
+                  
+                  <td align="center">
+                    <input type="checkbox" name="values(multiDates)" value="60.4" id="60.4">
+                  </td>
+                
+                  
+                  <td align="center">
+                    <input type="checkbox" name="values(multiDates)" value="60.5" id="60.5">
+                  </td>
+                
+                  
+                  <td align="center">
+                    <input type="checkbox" name="values(multiDates)" value="60.6" id="60.6">
+                  </td>
+                
+                  
+                  <td align="center">
+                    <input type="checkbox" name="values(multiDates)" value="60.Z" id="60.Z">
+                  </td>
+                
+              </tr>
+            
+              
+              <tr>
+                <th align="center">
+                  ７&nbsp;
+                </th>
+
+                
+                  
+                  <td align="center">
+                    <input type="checkbox" name="values(multiDates)" value="70.1" id="70.1">
+                  </td>
+                
+                  
+                  <td align="center">
+                    <input type="checkbox" name="values(multiDates)" value="70.2" id="70.2">
+                  </td>
+                
+                  
+                  <td align="center">
+                    <input type="checkbox" name="values(multiDates)" value="70.3" id="70.3">
+                  </td>
+                
+                  
+                  <td align="center">
+                    <input type="checkbox" name="values(multiDates)" value="70.4" id="70.4">
+                  </td>
+                
+                  
+                  <td align="center">
+                    <input type="checkbox" name="values(multiDates)" value="70.5" id="70.5">
+                  </td>
+                
+                  
+                  <td align="center">
+                    <input type="checkbox" name="values(multiDates)" value="70.6" id="70.6">
+                  </td>
+                
+                  
+                  <td align="center">
+                    <input type="checkbox" name="values(multiDates)" value="70.Z" id="70.Z">
+                  </td>
+                
+              </tr>
+            
+              
+              <tr>
+                <th align="center">
+                  ８&nbsp;
+                </th>
+
+                
+                  
+                  <td align="center">
+                    <input type="checkbox" name="values(multiDates)" value="80.1" id="80.1">
+                  </td>
+                
+                  
+                  <td align="center">
+                    <input type="checkbox" name="values(multiDates)" value="80.2" id="80.2">
+                  </td>
+                
+                  
+                  <td align="center">
+                    <input type="checkbox" name="values(multiDates)" value="80.3" id="80.3">
+                  </td>
+                
+                  
+                  <td align="center">
+                    <input type="checkbox" name="values(multiDates)" value="80.4" id="80.4">
+                  </td>
+                
+                  
+                  <td align="center">
+                    <input type="checkbox" name="values(multiDates)" value="80.5" id="80.5">
+                  </td>
+                
+                  
+                  <td align="center">
+                    <input type="checkbox" name="values(multiDates)" value="80.6" id="80.6">
+                  </td>
+                
+                  
+                  <td align="center">
+                    <input type="checkbox" name="values(multiDates)" value="80.Z" id="80.Z">
+                  </td>
+                
+              </tr>
+            
+              
+              <tr>
+                <th align="center">
+                  他&nbsp;
+                </th>
+
+                
+                  
+                  <td align="center">
+                    <input type="checkbox" name="values(multiDates)" value="ZZ.1" id="ZZ.1">
+                  </td>
+                
+                  
+                  <td align="center">
+                    <input type="checkbox" name="values(multiDates)" value="ZZ.2" id="ZZ.2">
+                  </td>
+                
+                  
+                  <td align="center">
+                    <input type="checkbox" name="values(multiDates)" value="ZZ.3" id="ZZ.3">
+                  </td>
+                
+                  
+                  <td align="center">
+                    <input type="checkbox" name="values(multiDates)" value="ZZ.4" id="ZZ.4">
+                  </td>
+                
+                  
+                  <td align="center">
+                    <input type="checkbox" name="values(multiDates)" value="ZZ.5" id="ZZ.5">
+                  </td>
+                
+                  
+                  <td align="center">
+                    <input type="checkbox" name="values(multiDates)" value="ZZ.6" id="ZZ.6">
+                  </td>
+                
+                  
+                  <td align="center">
+                    <input type="checkbox" name="values(multiDates)" value="ZZ.Z" id="ZZ.Z">
+                  </td>
+                
+              </tr>
+            
+          </table>
+          (曜日時限を指定する場合は、開講時期の選択が必要です。)
+        </td>
+      </tr>
+    </table>
+
+    <div class="contents_1">
+      <div class="function_bottom">
+        <table class="list" style="margin:0px;width:100%" >
+          <tr class="button">
+            
+            <td style="background:none">
+              <div style="text-align:right">
+                <input type="button" id="skgr_search" onclick="return exec('searchKougi',this,null)" value="シラバスを検索する" class="search decorate" />
+              </div>
+            </td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  
+  
+</form>
+
+</td>
+      
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<td id="sub1">
+  <div id="navigation">
+   
+   
+      
+      
+   
+
+  
+  
+  </div>
+  <div id="dummy"></div>
+  <br class="clear" />
+</td>
+
+    </tr>
+  </table>
+</div>
+
+<p id="pageTopButton">
+  <a href="#wrap" id="pageTopLink">PAGE TOP</a>
+</p>
+
+
+
+
+  <noscript><c:out value="JavaScriptを使用できる環境でご利用ください。" /></noscript>
+  <div id="footer">
+    <div class="text">Copyright FUJITSU LIMITED 2005-2014</div>
+  </div>
+
+</div>
+</body>
+</html>
+
