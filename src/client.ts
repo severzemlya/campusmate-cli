@@ -9,6 +9,7 @@ import type {
 import { parseSearchResults, parseInstructorResults, parseDetailPage } from "./parsers.js";
 
 const BASE_URL = "https://ku-portal.kyushu-u.ac.jp/campusweb/";
+const MAX_SEARCH_PAGE_SIZE = 200;
 
 export class CampusmateClient {
   private http: AxiosInstance;
@@ -85,7 +86,19 @@ export class CampusmateClient {
     });
 
     const html = await this.postSearch("slbsskgr.do", body);
-    const firstPage = parseSearchResults(html);
+    let firstPage = parseSearchResults(html);
+
+    if (limit > firstPage.results.length && firstPage.total > firstPage.results.length) {
+      const resizeBody = this.buildFormBody({
+        "navigateKougiList": "",
+        "value(pageCount)": "",
+        "value(maxCount)": String(MAX_SEARCH_PAGE_SIZE),
+        "timestamp": "",
+      });
+      const resizedHtml = await this.postSearch("slbsskgr.do", resizeBody);
+      firstPage = parseSearchResults(resizedHtml);
+    }
+
     let allResults = [...firstPage.results];
 
     // Paginate if needed
@@ -94,7 +107,7 @@ export class CampusmateClient {
       const pageBody = this.buildFormBody({
         "navigateKougiList": "",
         "value(pageCount)": String(page),
-        "value(maxCount)": "10",
+        "value(maxCount)": String(MAX_SEARCH_PAGE_SIZE),
         "timestamp": "",
       });
       const pageHtml = await this.postSearch("slbsskgr.do", pageBody);
