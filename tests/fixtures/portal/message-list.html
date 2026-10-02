@@ -1,0 +1,40 @@
+<html><head><title>Campusmate</title></head><body>
+<div id="login_inf">ログインユーザ ：<br>九大　太郎</div>
+<form name="wbaseActionForm" id="form" method="post" action="/campusweb/wbasmgjr.do">
+<input type="hidden" name="buttonName" value=""/>
+<input type="hidden" name="timestamp" value="1700000000002"/>
+<table class="list" id="messglist" width="100%">
+<tr class="link"><td colspan="6"><div class="left">
+1-2件表示/1058件中
+<a href="javascript:void(0);" onclick="doPaging('form','changeStateList','pageCount','2','maxCount','5');return false;">2</a>
+</div></td></tr>
+<tr class="label">
+<td></td>
+<td><a href="/campusweb/wbasmgjr.do?buttonName=changeStateList&sortType=titlesort&ascDesc=">タイトル</a></td>
+<td>種別</td><td>送信者</td><td>受信日時</td><td>既読日時</td>
+</tr>
+<tr class="column_odd">
+<td class="function_bottom"><input type="checkbox" name="values(messgIds)" value="2300001" onclick="changeAllCheckBoxState();"></td>
+<td style="font-weight: bold;">
+<a href="#" onclick="return selectMsgr(0);">
+[重要] 【基幹教育】後期履修登録期間が開始します
+</a>
+</td>
+<td style="font-weight: bold;">教務関係</td>
+<td style="font-weight: bold;">（基幹）基幹教育教務係</td>
+<td style="font-weight: bold;">2026/10/02 09:10   </td>
+<td></td>
+</tr>
+<tr class="column_even">
+<td class="function_bottom"><input type="checkbox" name="values(messgIds)" value="2300000" onclick="changeAllCheckBoxState();"></td>
+<td><a href="#" onclick="return selectMsgr(1);">工事のお知らせ</a></td>
+<td>お知らせ（その他）</td>
+<td>事務局</td>
+<td>2026/10/01 17:50</td>
+<td>2026/10/02 08:00</td>
+</tr>
+</table>
+<input type="hidden" name="value(pageCount)" value="" id="pageCount">
+<input type="hidden" name="value(maxCount)" value="" id="maxCount">
+</form>
+</body></html>

@@ -1,11 +1,14 @@
 ---
 name: campusmate-syllabus
-description: "Use when the user asks about Kyushu University (九州大学) courses, syllabus, lectures, or instructors. Trigger on mentions of Campusmate, 九大シラバス, lecture search, syllabus lookup, finding courses at Kyushu University, checking what a professor teaches, or looking up course details by code. Also trigger when the user wants to search Japanese university syllabi and Kyushu University is the context."
+description: "Use when the user asks about Kyushu University (九州大学) courses, syllabus, lectures, or instructors, or about their own Campusmate data: grades (成績), GPA, timetable (時間割), notices / messages (お知らせ, 教務連絡). Trigger on mentions of Campusmate, 九大シラバス, lecture search, syllabus lookup, finding courses at Kyushu University, checking what a professor teaches, looking up course details by code, 成績照会, GPA, My時間割, 履修している講義, or 大学からのお知らせ. Also trigger when the user wants to search Japanese university syllabi and Kyushu University is the context."
 ---
 
-# Campusmate-J Syllabus Search Tool
+# Campusmate-J Tool
 
-Search the Kyushu University Campusmate-J syllabus system via CLI. The tool scrapes the live Campusmate-J portal and returns structured JSON — no API key, authentication, or local setup required.
+Access the Kyushu University Campusmate-J portal via CLI. The tool scrapes the live portal and returns structured JSON.
+
+- **Syllabus search** — public, no authentication required
+- **Grades / GPA / timetable / notices** — the user's own data, requires login with their Kyushu University SSO-KID
 
 ## Commands
 
@@ -40,6 +43,32 @@ Retrieve the full syllabus for a specific lecture code. Use this after a search 
 ```bash
 npx @severzemlya/campusmate-cli detail --code <講義コード> [--year <年度>]
 ```
+
+## Logged-in Commands (user's own data)
+
+```bash
+npx @severzemlya/campusmate-cli status                     # {"sessionValid": bool, "credentials": "env"|"config"|"none"}
+npx @severzemlya/campusmate-cli grades [--year <年度>]      # Course grades (grade S/A/B/C/D/F/R, gp null = not in GPA)
+npx @severzemlya/campusmate-cli grades --gpa               # GPA: total, byType, byCategory, byTerm
+npx @severzemlya/campusmate-cli timetable [--term 前期|後期] # Registered lectures by day/period + intensive courses
+npx @severzemlya/campusmate-cli notices [--type messages|univ|job] [--limit <n>] [--unread]
+npx @severzemlya/campusmate-cli notice --id <id> [--type messages|univ|job]   # Full text — MARKS IT AS READ
+```
+
+`--type`: `messages` = メッセージ受信一覧 (default), `univ` = 大学からのお知らせ, `job` = 就職のお知らせ. Use the same `--type` for `notice` as the list the ID came from.
+
+### Login handling
+
+- Commands re-login automatically when the session has expired (SSO session → saved credentials).
+- If a command fails with a login error, ask the user to run `campusmate-cli login` themselves (in Claude Code: `! npx @severzemlya/campusmate-cli login`). Login prompts for the password on the terminal or reads it from 1Password (`login --op "op://<vault>/<item>"`).
+- **Never ask the user to type their SSO-KID or password into the chat**, and never pass credentials on the command line.
+
+### Data handling
+
+- Grades and GPA are personal data — present them to the user, but don't write them to files or send them anywhere unless asked.
+- Notices and messages are for university members only. Summarize them for the user; do not republish them.
+- `notice` marks the message as read on the portal. Only open messages the user asked about; use `notices` (list) for overviews.
+- The tool is read-only. It cannot register courses or change settings — tell the user to use the web portal for that.
 
 ## Typical Workflow
 
@@ -80,6 +109,7 @@ Increase `--limit` if the user wants a broader search or the total count suggest
 
 ## Important Considerations
 
-- This tool hits a live university portal. Avoid rapid-fire requests or large batch operations — be a good citizen.
+- This tool hits a live university portal. Avoid rapid-fire requests or large batch operations — be a good citizen. Don't loop over many `notice` calls or poll periodically.
+- This is an unofficial tool, used at the user's own risk under university regulations.
 - If a search returns 0 results, try broader terms or different search types before concluding the lecture doesn't exist.
 - Japanese input works directly (e.g., `--name "線形代数"`). Mixing Japanese and English is fine for fulltext search.

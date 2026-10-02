@@ -1,6 +1,6 @@
 # @severzemlya/campusmate-cli
 
-九州大学 Campusmate-J シラバス検索 CLI ツール。構造化された JSON を出力し、[Claude Code](https://docs.anthropic.com/en/docs/claude-code) のスキルとして利用できます。
+九州大学 Campusmate-J の CLI ツール。シラバス検索に加え、ログインして自分の成績・時間割・お知らせを取得できます。構造化された JSON を出力し、[Claude Code](https://docs.anthropic.com/en/docs/claude-code) のスキルとして利用できます。
 
 ## 機能
 
@@ -8,6 +8,19 @@
 - **教員検索** — 教員名から担当講義を検索（2段階検索）
 - **全文検索** — シラバス全体をキーワード検索
 - **詳細取得** — 講義コードから完全なシラバス情報を取得
+- **ログイン後の機能**（九大 SSO でログイン）
+  - **成績・GPA** — 成績一覧、科目区分別・学期別の GPA
+  - **My時間割** — 曜日・時限ごとの履修講義（前期 / 後期）
+  - **お知らせ・メッセージ** — 一覧（未読の絞り込み）と本文
+
+## 注意事項
+
+- **非公式ツールです。** 九州大学および Campusmate の提供元とは一切関係ありません。
+- **利用は自己責任です。** 本ツールの利用によって生じたいかなる結果についても、作者は責任を負いません（[MIT ライセンス](LICENSE)）。九州大学情報倫理規程などの学内規則を守るのは利用者自身です。
+- **自分のアカウントでのみ使ってください。** 他人の SSO-KID・パスワードを扱ったり、他人に代わってログインしたりする用途には使わないでください。
+- **アクセスは控えめに。** 本ツールは通信を逐次実行し、リクエスト間に待ち時間を入れていますが、短時間の大量実行や定期的な自動巡回は避けてください。
+- **取得した情報の扱いに注意してください。** 成績は個人情報です。お知らせ・メッセージは学内向けの情報なので、外部に転載しないでください。
+- **読み取り専用です。** 履修登録などの書き込み操作は行いません。ただし `notice` で本文を開いたメッセージはポータル上で既読になります。
 
 ## 必要要件
 
@@ -39,6 +52,55 @@ campusmate-cli search-lecture --name "線形代数"
 |-----------|------|-----------|
 | `--year <年度>` | 対象年度 | 現在の年度 |
 | `--limit <件数>` | 最大取得件数 | 10 |
+
+## ログインが必要な機能
+
+### ログイン
+
+```bash
+# 端末で SSO-KID とパスワードを入力（保存はされません）
+campusmate-cli login
+
+# 1Password の項目を使う（username / password 欄を参照。設定ファイルには参照だけを保存）
+campusmate-cli login --op "op://Personal/<項目名またはID>"
+
+# 環境変数でも指定可能（値に op:// 参照も使えます）
+CAMPUSMATE_USERNAME=... CAMPUSMATE_PASSWORD=... campusmate-cli login
+```
+
+ログイン状態（Cookie）は `~/.config/campusmate-cli/session.json`（権限 600）に保存されます。セッションが切れていた場合は、各コマンドが次の順に自動で再ログインします。
+
+1. 九大 SSO のセッションが残っていれば、パスワードなしで再ログイン
+2. 環境変数または設定ファイル（1Password 参照）に認証情報があれば、それを使ってログイン
+3. どちらもなければエラーになるので、`campusmate-cli login` を実行し直してください
+
+パスワードを平文でファイルに保存する機能はありません。
+
+```bash
+campusmate-cli status            # セッションが有効か、認証情報の設定状況
+campusmate-cli logout            # ログアウトしてセッションを削除
+campusmate-cli logout --forget   # 1Password 参照の設定も削除
+```
+
+### コマンド
+
+```bash
+campusmate-cli grades                      # 成績一覧
+campusmate-cli grades --year 2026          # 年度で絞り込み
+campusmate-cli grades --gpa                # GPA（合計・区分別・学期別）
+campusmate-cli timetable                   # My時間割（現在の学期）
+campusmate-cli timetable --term 前期       # 前期 / 後期 を指定
+campusmate-cli notices                     # メッセージ受信一覧
+campusmate-cli notices --type univ --limit 20 --unread   # 大学からのお知らせ（未読のみ）
+campusmate-cli notices --type job          # 就職のお知らせ
+campusmate-cli notice --id 2300001 --type univ           # 本文を取得（既読になります）
+```
+
+| `--type` | 内容 |
+|----------|------|
+| `messages` | メッセージ受信一覧（既定） |
+| `univ` | 大学からのお知らせ |
+| `job` | 就職のお知らせ |
 
 ## 出力形式
 
@@ -103,7 +165,7 @@ cp -r skills/campusmate-skill ~/.claude/skills/
 ```bash
 npm install
 npm run build       # TypeScript コンパイル
-npm test            # テスト実行（51テスト）
+npm test            # テスト実行
 npm run test:watch  # ウォッチモード
 ```
 
@@ -113,6 +175,7 @@ npm run test:watch  # ウォッチモード
 - [Commander](https://github.com/tj/commander.js) — CLI フレームワーク
 - [Axios](https://github.com/axios/axios) — HTTP クライアント
 - [Cheerio](https://github.com/cheeriojs/cheerio) — HTML パーサー
+- [tough-cookie](https://github.com/salesforce/tough-cookie) — Cookie 管理
 - [Vitest](https://vitest.dev/) — テストフレームワーク
 
 ## ライセンス

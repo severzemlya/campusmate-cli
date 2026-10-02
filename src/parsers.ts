@@ -15,7 +15,7 @@ import type {
  * Full-width ideographic spaces (U+3000) are intentionally preserved because
  * they are meaningful in Japanese names and schedule strings.
  */
-function normalise(text: string): string {
+export function normalise(text: string): string {
   return text
     .replace(/\u00a0/g, " ")   // &nbsp; → regular space
     .replace(/\.none_display\s*\{[^}]*\}\s*/g, "") // strip CSS artifacts
