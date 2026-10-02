@@ -1,4 +1,6 @@
 import { InvalidArgumentError, type Command } from "commander";
+import { tmpdir } from "node:os";
+import { join, resolve } from "node:path";
 import { PortalClient } from "../portal.js";
 import { parsePositiveInt } from "../validate.js";
 import type { MessageKind } from "../types.js";
@@ -32,8 +34,14 @@ export function registerNotices(program: Command): void {
     .description("お知らせ・メッセージの本文を取得 (要ログイン。開いたメッセージはポータル上で既読になります)")
     .requiredOption("--id <id>", "notices で得たメッセージ ID")
     .option("--type <type>", TYPE_HELP, parseKind, "messages")
+    .option("--download [dir]", "添付ファイルを保存 (省略時は一時ディレクトリ)。出力の attachments[].path に保存先")
     .action(async (opts) => {
       const client = await PortalClient.open();
-      console.log(JSON.stringify(await client.message(opts.type, opts.id), null, 2));
+      const downloadDir = opts.download
+        ? opts.download === true
+          ? join(tmpdir(), "campusmate-cli", opts.id)
+          : resolve(opts.download)
+        : undefined;
+      console.log(JSON.stringify(await client.message(opts.type, opts.id, { downloadDir }), null, 2));
     });
 }

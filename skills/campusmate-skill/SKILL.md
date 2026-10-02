@@ -52,8 +52,18 @@ npx @severzemlya/campusmate-cli grades [--year <年度>]      # Course grades (g
 npx @severzemlya/campusmate-cli grades --gpa               # GPA: total, byType, byCategory, byTerm
 npx @severzemlya/campusmate-cli timetable [--term 前期|後期] # Registered lectures by day/period + intensive courses
 npx @severzemlya/campusmate-cli notices [--type messages|univ|job] [--limit <n>] [--unread]
-npx @severzemlya/campusmate-cli notice --id <id> [--type messages|univ|job]   # Full text — MARKS IT AS READ
+npx @severzemlya/campusmate-cli notice --id <id> [--type messages|univ|job] [--download [dir]]   # Full text — MARKS IT AS READ
 ```
+
+### Attachments
+
+`notice` output has `attachments: [{ name, fileId }]`. The file IDs are only valid right after the message is opened, so download in the same call:
+
+```bash
+npx @severzemlya/campusmate-cli notice --id <id> --download   # saves to a temp dir; attachments[].path is set
+```
+
+Then read the files with the Read tool (PDFs and images are supported) and summarize them for the user. Don't copy attachments elsewhere unless the user asks.
 
 `--type`: `messages` = メッセージ受信一覧 (default), `univ` = 大学からのお知らせ, `job` = 就職のお知らせ. Use the same `--type` for `notice` as the list the ID came from.
 

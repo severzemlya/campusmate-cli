@@ -1,3 +1,5 @@
+import { mkdir, writeFile } from "node:fs/promises";
+import { basename, join } from "node:path";
 import { ssoLogin, resolveCredentials, type Credentials } from "./auth.js";
 import { HttpSession, type PageResponse } from "./session.js";
 import {
@@ -114,8 +116,15 @@ export class PortalClient {
   /**
    * Open a message by ID. Opening a message marks it as read on the portal.
    * Searches up to `maxPages` pages of 100 items.
+   * With `downloadDir`, attachments are saved there right after opening
+   * (their file IDs are only valid within that page view).
    */
-  async message(kind: MessageKind, id: string, maxPages = 3): Promise<MessageDetail & { id: string }> {
+  async message(
+    kind: MessageKind,
+    id: string,
+    opts: { downloadDir?: string; maxPages?: number } = {},
+  ): Promise<MessageDetail & { id: string }> {
+    const maxPages = opts.maxPages ?? 3;
     let page = await this.page(MESSAGE_ENTRY[kind]);
     for (let p = 1; p <= maxPages; p++) {
       page = await this.changeListPage(page, p, 100);
@@ -127,11 +136,31 @@ export class PortalClient {
           ["timestamp", extractTimestamp(page.html) ?? ""],
           ["value(selectDetailIndex)", String(item.index)],
         ]);
-        return { id, ...parseMessageDetail(detail.html) };
+        const parsed = parseMessageDetail(detail.html);
+        if (opts.downloadDir && parsed.attachments.length > 0) {
+          await this.downloadAttachments(parsed, opts.downloadDir);
+        }
+        return { id, ...parsed };
       }
       if (list.to >= list.total) break;
     }
     throw new Error(`ID ${id} のメッセージが見つかりませんでした (直近 ${maxPages * 100} 件を検索)`);
+  }
+
+  private async downloadAttachments(detail: MessageDetail, dir: string): Promise<void> {
+    await mkdir(dir, { recursive: true });
+    for (const [i, att] of detail.attachments.entries()) {
+      await this.throttle();
+      const file = await this.session.download(`filedownload.do?sessionFileId=${att.fileId}`);
+      if (file.status !== 200 || file.contentType.includes("text/html")) {
+        throw new Error(`添付ファイル「${att.name}」を取得できませんでした (HTTP ${file.status})`);
+      }
+      const filename = safeFilename(file.filename ?? `${i + 1}_${att.name}`);
+      const path = join(dir, filename);
+      await writeFile(path, file.data);
+      Object.assign(att, { filename, path, size: file.data.length });
+    }
+    await this.session.save();
   }
 
   private async changeListPage(current: PageResponse, pageNo: number, pageSize: number): Promise<PageResponse> {
@@ -181,4 +210,10 @@ export class PortalClient {
     if (wait > 0) await sleep(wait);
     this.lastRequest = Date.now();
   }
+}
+
+/** Keep only the last path segment and drop characters that are invalid in file names */
+function safeFilename(name: string): string {
+  const cleaned = basename(name.replace(/\\/g, "/")).replace(/[\x00-\x1f<>:"|?*]/g, "_").trim();
+  return cleaned && cleaned !== "." && cleaned !== ".." ? cleaned : "attachment";
 }

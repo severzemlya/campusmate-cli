@@ -238,4 +238,11 @@ describe("parseMessageDetail", () => {
     expect(result.fields).toEqual({ 掲示期間: "2026/10/02 ～ 2026/10/09" });
     expect(result.links).toEqual(["https://example.kyushu-u.ac.jp/notice"]);
   });
+
+  it("collects attachments with their session file IDs", () => {
+    expect(result.attachments).toEqual([
+      { name: "履修登録の手引き（令和８年度後期", fileId: "1234567890" },
+      { name: "Guide (EN)", fileId: "-987654321" },
+    ]);
+  });
 });

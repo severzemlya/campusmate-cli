@@ -295,7 +295,7 @@ export function parseMessageList(html: string): MessageListResponse {
   };
 }
 
-const DETAIL_LABELS: Record<string, keyof MessageDetail> = {
+const DETAIL_LABELS: Record<string, "title" | "sender" | "type" | "body"> = {
   送信者: "sender",
   メッセージ種別: "type",
   タイトル: "title",
@@ -304,7 +304,7 @@ const DETAIL_LABELS: Record<string, keyof MessageDetail> = {
 
 export function parseMessageDetail(html: string): MessageDetail {
   const $ = cheerio.load(html);
-  const detail: MessageDetail = { title: "", sender: "", type: "", body: "", fields: {}, links: [] };
+  const detail: MessageDetail = { title: "", sender: "", type: "", body: "", fields: {}, links: [], attachments: [] };
 
   $("table.detail")
     .first()
@@ -312,10 +312,12 @@ export function parseMessageDetail(html: string): MessageDetail {
     .each((_, tr) => {
       const label = clean($(tr).children("td.label").text());
       const item = $(tr).children("td.item");
+      // Attachment rows ("ファイル１", "ファイル２", ...) are collected separately
+      if (label === "添付ファイル" || item.find('a[href*="filedownload.do"]').length > 0) return;
       if (!label || item.length === 0) return;
       const value = label === "本文" ? multilineText($, item) : clean(item.text());
       const key = DETAIL_LABELS[label];
-      if (key && key !== "fields" && key !== "links") {
+      if (key) {
         detail[key] = value;
       } else {
         detail.fields[label] = value;
@@ -325,6 +327,11 @@ export function parseMessageDetail(html: string): MessageDetail {
         if (href && !href.startsWith("javascript") && href !== "#") detail.links.push(href);
       });
     });
+
+  $('table.detail a[href*="filedownload.do"]').each((_, a) => {
+    const fileId = ($(a).attr("href") ?? "").match(/sessionFileId=(-?\d+)/)?.[1];
+    if (fileId) detail.attachments.push({ name: clean($(a).text()), fileId });
+  });
 
   return detail;
 }

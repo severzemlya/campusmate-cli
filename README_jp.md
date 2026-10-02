@@ -11,7 +11,7 @@
 - **ログイン後の機能**（九大 SSO でログイン）
   - **成績・GPA** — 成績一覧、科目区分別・学期別の GPA
   - **My時間割** — 曜日・時限ごとの履修講義（前期 / 後期）
-  - **お知らせ・メッセージ** — 一覧（未読の絞り込み）と本文
+  - **お知らせ・メッセージ** — 一覧（未読の絞り込み）、本文、添付ファイルのダウンロード
 
 ## 注意事項
 
@@ -94,6 +94,8 @@ campusmate-cli notices                     # メッセージ受信一覧
 campusmate-cli notices --type univ --limit 20 --unread   # 大学からのお知らせ（未読のみ）
 campusmate-cli notices --type job          # 就職のお知らせ
 campusmate-cli notice --id 2300001 --type univ           # 本文を取得（既読になります）
+campusmate-cli notice --id 2300001 --download            # 添付ファイルも保存（既定は一時ディレクトリ）
+campusmate-cli notice --id 2300001 --download ./files    # 保存先を指定
 ```
 
 | `--type` | 内容 |

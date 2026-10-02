@@ -45,7 +45,7 @@ export class HttpSession {
     this.http = axios.create({
       timeout: 30000,
       maxRedirects: 0,
-      responseType: "text",
+      responseType: "arraybuffer",
       validateStatus: () => true,
       headers: {
         "User-Agent": USER_AGENT,
@@ -78,21 +78,35 @@ export class HttpSession {
   }
 
   async get(url: string): Promise<PageResponse> {
-    return this.request("GET", url);
+    const res = await this.request("GET", url);
+    return { url: res.url, status: res.status, html: res.data.toString("utf8") };
   }
 
   async post(url: string, fields: FormFields): Promise<PageResponse> {
-    return this.request("POST", url, encodeForm(fields));
+    const res = await this.request("POST", url, encodeForm(fields));
+    return { url: res.url, status: res.status, html: res.data.toString("utf8") };
   }
 
-  private async request(method: "GET" | "POST", url: string, body?: string): Promise<PageResponse> {
+  /** GET a file. The filename comes from Content-Disposition when present. */
+  async download(url: string): Promise<FileResponse> {
+    const res = await this.request("GET", url);
+    return {
+      url: res.url,
+      status: res.status,
+      data: res.data,
+      contentType: String(res.headers["content-type"] ?? ""),
+      filename: filenameFromDisposition(String(res.headers["content-disposition"] ?? "")),
+    };
+  }
+
+  private async request(method: "GET" | "POST", url: string, body?: string): Promise<RawResponse> {
     let current = new URL(url, PORTAL_BASE).toString();
     let currentMethod = method;
     let currentBody = body;
 
     for (let i = 0; i <= MAX_REDIRECTS; i++) {
       const cookie = await this.jar.getCookieString(current);
-      const res = await this.http.request<string>({
+      const res = await this.http.request<ArrayBuffer>({
         method: currentMethod,
         url: current,
         data: currentBody,
@@ -118,8 +132,45 @@ export class HttpSession {
         continue;
       }
 
-      return { url: current, status: res.status, html: String(res.data ?? "") };
+      return {
+        url: current,
+        status: res.status,
+        headers: res.headers as Record<string, unknown>,
+        data: Buffer.from(res.data ?? new ArrayBuffer(0)),
+      };
     }
     throw new Error(`Too many redirects: ${url}`);
   }
+}
+
+interface RawResponse {
+  url: string;
+  status: number;
+  headers: Record<string, unknown>;
+  data: Buffer;
+}
+
+export interface FileResponse {
+  url: string;
+  status: number;
+  data: Buffer;
+  contentType: string;
+  filename: string | null;
+}
+
+/**
+ * Extract the filename from a Content-Disposition header.
+ * Campusmate sends raw UTF-8 bytes in `filename="..."`, which Node exposes
+ * as latin1 characters, so they are re-decoded as UTF-8.
+ */
+export function filenameFromDisposition(header: string): string | null {
+  const star = header.match(/filename\*=(?:UTF-8|utf-8)''([^;]+)/);
+  if (star) return decodeURIComponent(star[1].trim());
+  const plain = header.match(/filename="([^"]*)"/) ?? header.match(/filename=([^;]+)/);
+  if (!plain) return null;
+  const raw = plain[1].trim();
+  // Only re-decode when every char fits in a byte (i.e. it was latin1-decoded)
+  if (!/^[\x00-\xff]*$/.test(raw)) return raw;
+  const decoded = Buffer.from(raw, "latin1").toString("utf8");
+  return decoded.includes("\ufffd") ? raw : decoded;
 }

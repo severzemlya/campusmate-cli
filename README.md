@@ -11,7 +11,7 @@ A CLI tool for the Kyushu University (九州大学) Campusmate-J portal: syllabu
 - **Logged-in features** (via Kyushu University SSO)
   - **Grades & GPA** — course grades, GPA by category and by term
   - **Timetable** — your registered lectures by day and period (first / second term)
-  - **Notices & messages** — lists (with unread filter) and full text
+  - **Notices & messages** — lists (with unread filter), full text and attachment download
 
 ## Disclaimer
 
@@ -94,6 +94,8 @@ campusmate-cli notices                     # Received messages
 campusmate-cli notices --type univ --limit 20 --unread   # University notices (unread only)
 campusmate-cli notices --type job          # Career notices
 campusmate-cli notice --id 2300001 --type univ           # Full text (marks it as read)
+campusmate-cli notice --id 2300001 --download            # Also save attachments (temp dir by default)
+campusmate-cli notice --id 2300001 --download ./files    # Save attachments to a directory
 ```
 
 | `--type` | Content |

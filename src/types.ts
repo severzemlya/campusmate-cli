@@ -163,4 +163,16 @@ export interface MessageDetail {
   /** Other label/value rows on the detail page */
   fields: Record<string, string>;
   links: string[];
+  attachments: MessageAttachment[];
+}
+
+export interface MessageAttachment {
+  /** Link text on the portal (may be truncated) */
+  name: string;
+  /** Session-scoped file ID: only valid right after the message is opened */
+  fileId: string;
+  /** Set when the file was downloaded */
+  filename?: string;
+  path?: string;
+  size?: number;
 }
